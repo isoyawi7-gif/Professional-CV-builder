@@ -17,30 +17,6 @@ body {
     color: white;
 }
 
-/* ===================== HEADER (GLASS) ===================== */
-header {
-    position: sticky;
-    top: 0;
-    backdrop-filter: blur(12px);
-    background: rgba(0,0,0,0.4);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding: 15px;
-    text-align: center;
-    z-index: 1000;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 24px;
-    letter-spacing: 2px;
-}
-
-header h3 {
-    margin: 5px 0;
-    font-weight: normal;
-    color: #00ffcc;
-}
-
 /* ===================== FORM ===================== */
 .form-container {
     width: 90%;
@@ -50,7 +26,6 @@ header h3 {
     background: rgba(255,255,255,0.08);
     backdrop-filter: blur(15px);
     border-radius: 15px;
-    border: 1px solid rgba(255,255,255,0.1);
 }
 
 input, textarea {
@@ -59,7 +34,6 @@ input, textarea {
     margin: 6px 0;
     border-radius: 8px;
     border: none;
-    outline: none;
 }
 
 /* ===================== BUTTON ===================== */
@@ -72,63 +46,64 @@ button {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: 0.3s;
 }
 
-button:hover {
-    background: #00c9a7;
-}
-
-/* ===================== CV OUTPUT ===================== */
-#cv {
+/* ===================== PDF DOCUMENT WRAPPER ===================== */
+#cvDocument {
     width: 900px;
-    margin: 20px auto;
-    display: flex;
+    margin: auto;
     background: white;
     color: black;
-    border-radius: 10px;
-    overflow: hidden;
 }
 
-/* LEFT */
-.left {
-    width: 30%;
-    padding: 20px;
+/* ===================== HEADER ===================== */
+header {
+    text-align: center;
+    padding: 15px;
+    background: #111827;
     color: white;
 }
 
-/* RIGHT */
+header h1 {
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+header h3 {
+    margin: 5px 0;
+    color: #00ffcc;
+}
+
+/* ===================== CV ===================== */
+#cv {
+    display: flex;
+}
+
+.left {
+    width: 30%;
+    padding: 20px;
+    background: #1f2937;
+    color: white;
+}
+
 .right {
     width: 70%;
     padding: 20px;
 }
 
-/* ===================== GLASS BOX ===================== */
 .section-box {
-    background: rgba(255,255,255,0.1);
+    background: #f3f4f6;
     padding: 10px;
-    border-radius: 10px;
     margin-bottom: 10px;
 }
 
-/* ===================== MOBILE ===================== */
-@media(max-width: 768px){
-    #cv {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .left, .right {
-        width: 100%;
-    }
-}
-
-/* ===================== WATERMARK ===================== */
-.watermark {
+/* ===================== FOOTER ===================== */
+footer {
     text-align: center;
-    font-size: 12px;
-    margin-bottom: 20px;
-    color: #aaa;
+    padding: 15px;
+    background: #111827;
+    color: #00ffcc;
+    font-size: 13px;
 }
 
 </style>
@@ -136,6 +111,27 @@ button:hover {
 
 <body>
 
+<!-- ===================== FORM ===================== -->
+<div class="form-container">
+
+<h2>CV Builder</h2>
+
+<input id="name" placeholder="Full Name">
+<input id="phone" placeholder="Phone">
+<input id="email" placeholder="Email">
+<input id="address" placeholder="Address">
+
+<textarea id="achievements" placeholder="Achievements"></textarea>
+
+<button onclick="generateCV()">Generate CV</button>
+<button onclick="downloadPDF()">Download PDF</button>
+
+</div>
+
+<!-- ===================== FULL PDF AREA ===================== -->
+<div id="cvDocument">
+
+<!-- HEADER (NOW INCLUDED IN PDF) -->
 <header>
     <h1>ISO YAWI</h1>
     <h3>Engineering • Software • Innovation</h3>
@@ -144,203 +140,86 @@ button:hover {
     </div>
 </header>
 
-<div class="form-container">
-
-<h2>CV Builder (Professional Glass Edition)</h2>
-
-<input id="name" placeholder="Full Name">
-<input id="phone" placeholder="Phone Number">
-<input id="email" placeholder="Email">
-<input id="address" placeholder="Address">
-
-<h3>Experience</h3>
-<div id="jobsContainer"></div>
-<button onclick="addJob()">+ Add Job</button>
-
-<h3>Education</h3>
-<div id="educationContainer"></div>
-<button onclick="addEducation()">+ Add Education</button>
-
-<h3>Achievements</h3>
-<textarea id="achievements"></textarea>
-
-<h3>Theme Color</h3>
-<input type="color" id="colorPicker" value="#2c3e50">
-
-<button onclick="generateCV()">Generate CV</button>
-<button onclick="downloadPDF()">Download PDF</button>
-
-</div>
-
-<!-- ===================== CV ===================== -->
+<!-- CV CONTENT -->
 <div id="cv">
 
-<div class="left" id="leftSide">
+<div class="left">
     <h3>SUMMARY</h3>
     <p id="summary"></p>
 
-    <h3>KEY ACHIEVEMENTS</h3>
-    <p id="outputAchievements"></p>
+    <h3>ACHIEVEMENTS</h3>
+    <p id="outAch"></p>
 </div>
 
 <div class="right">
     <h1 id="outName"></h1>
-    <p id="outContact"></p>
-
-    <h3>EXPERIENCE</h3>
-    <div id="outJobs"></div>
-
-    <h3>EDUCATION</h3>
-    <div id="outEducation"></div>
+    <p id="contact"></p>
 </div>
 
 </div>
 
-<div class="watermark">
-Powered by ISO YAWI | CV BUILDER SYSTEM
+<!-- FOOTER (NOW INCLUDED IN PDF ✔) -->
+<footer>
+    ⚡ ISO YAWI • Engineering Innovation System ⚡<br>
+    Electrical Engineering • Software Development • Telecommunications • PNGUoT
+</footer>
+
 </div>
 
 <script>
 
-let jobCount = 0;
-let eduCount = 0;
-let isGenerated = false;   // ✅ IMPORTANT LOCK
+let isGenerated = false;
 
-function addJob(){
-    if(jobCount >= 10) return alert("Max 10 jobs");
-
-    let div = document.createElement("div");
-    div.className = "section-box";
-
-    div.innerHTML = `
-        <input placeholder="Company">
-        <input placeholder="Position">
-        <input placeholder="Year Start">
-        <input placeholder="Year End">
-        <textarea placeholder="Responsibilities"></textarea>
-        <button onclick="this.parentElement.remove()">Remove</button>
-    `;
-
-    document.getElementById("jobsContainer").appendChild(div);
-    jobCount++;
-}
-
-function addEducation(){
-
-    let div = document.createElement("div");
-    div.className = "section-box";
-
-    div.innerHTML = `
-        <input placeholder="Institution">
-        <input placeholder="Year Started">
-        <input placeholder="Year Ended">
-        <label><input type="checkbox"> Currently Studying</label>
-        <button onclick="this.parentElement.remove()">Remove</button>
-    `;
-
-    document.getElementById("educationContainer").appendChild(div);
-    eduCount++;
-}
-
-/* SUMMARY */
-function generateSummary(text, achievements){
-    return "Results-driven professional with experience in " + text.slice(0,80) +
-    ". Proven track record in " + achievements.slice(0,80) +
-    ". Strong leadership, engineering and problem-solving skills.";
-}
-
-/* GENERATE CV */
+/* ===================== GENERATE ===================== */
 function generateCV(){
-
-    let color = document.getElementById("colorPicker").value;
-    document.getElementById("leftSide").style.background = color;
 
     document.getElementById("outName").innerText =
         document.getElementById("name").value;
 
-    document.getElementById("outContact").innerText =
+    document.getElementById("contact").innerText =
         document.getElementById("phone").value + " | " +
         document.getElementById("email").value + " | " +
         document.getElementById("address").value;
 
-    /* JOBS */
-    let jobs = document.querySelectorAll("#jobsContainer .section-box");
-    let jobsHTML = "";
-    let jobText = "";
+    document.getElementById("outAch").innerText =
+        document.getElementById("achievements").value;
 
-    jobs.forEach(job=>{
-        let inputs = job.querySelectorAll("input, textarea");
+    document.getElementById("summary").innerText =
+        "Electrical Engineer with expertise in telecom systems, IT infrastructure, and network deployment.";
 
-        jobsHTML += `
-        <p><b>${inputs[1].value}</b> - ${inputs[0].value}<br>
-        ${inputs[2].value} - ${inputs[3].value}<br>
-        ${inputs[4].value}</p>
-        `;
-
-        jobText += inputs[1].value + " " + inputs[0].value + " ";
-    });
-
-    document.getElementById("outJobs").innerHTML = jobsHTML;
-
-    /* EDUCATION */
-    let edus = document.querySelectorAll("#educationContainer .section-box");
-    let eduHTML = "";
-
-    edus.forEach(edu=>{
-        let inputs = edu.querySelectorAll("input");
-
-        let current = inputs[3].checked ? "Present" : inputs[2].value;
-
-        eduHTML += `
-        <p><b>${inputs[0].value}</b><br>
-        ${inputs[1].value} - ${current}</p>
-        `;
-    });
-
-    document.getElementById("outEducation").innerHTML = eduHTML;
-
-    let achievements = document.getElementById("achievements").value;
-    document.getElementById("outputAchievements").innerText = achievements;
-
-    let summary = generateSummary(jobText, achievements);
-    document.getElementById("summary").innerText = summary;
-
-    isGenerated = true; // ✅ ENABLE DOWNLOAD
+    isGenerated = true;
 }
 
-/* DOWNLOAD PDF (LOCKED) */
+/* ===================== PDF DOWNLOAD FIXED ===================== */
 function downloadPDF(){
 
     if(!isGenerated){
-        alert("Please generate CV first before downloading!");
+        alert("Generate CV first!");
         return;
     }
 
-    html2pdf().from(document.getElementById("cv")).save("CV.pdf");
+    const element = document.getElementById("cvDocument");
+
+    const opt = {
+        margin: 0,
+        filename: 'ISO_YAWI_CV.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff"
+        },
+        jsPDF: {
+            unit: 'px',
+            format: [900, 1200],
+            orientation: 'portrait'
+        }
+    };
+
+    html2pdf().set(opt).from(element).save();
 }
 
 </script>
-<!-- ===================== FOOTER ===================== -->
-<footer style="
-    margin-top: 30px;
-    padding: 18px;
-    text-align: center;
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    color: #00ffcc;
-    font-size: 13px;
-    letter-spacing: 1px;
-">
 
-    <div style="margin-bottom:5px;">
-        ⚡ ISO YAWI • Engineering Innovation System ⚡
-    </div>
-
-    <div style="color:#aaa;">
-        Electrical Engineering • Software Development • Telecommunications • PNG University of Technology
-    </div>
-
-</footer>
 </body>
 </html>
