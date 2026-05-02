@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CV Builder - ISO Yawi</title>
 
-<!-- PDF LIBRARY -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
@@ -15,7 +14,7 @@ body {
     background: #f4f4f4;
 }
 
-/* FORM SECTION */
+/* FORM */
 .form-container {
     padding: 20px;
     background: white;
@@ -27,7 +26,13 @@ input, textarea {
     margin: 5px 0;
 }
 
-/* CV TEMPLATE */
+.section-box {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* CV */
 #cv {
     width: 900px;
     margin: 20px auto;
@@ -35,153 +40,224 @@ input, textarea {
     background: white;
 }
 
-/* LEFT SIDE */
+/* LEFT */
 .left {
     width: 30%;
     padding: 20px;
     color: white;
 }
 
-/* RIGHT SIDE */
+/* RIGHT */
 .right {
     width: 70%;
     padding: 20px;
 }
 
-/* WATERMARK */
-.watermark {
-    text-align: center;
-    font-size: 12px;
-    margin-top: 10px;
+/* MOBILE VERSION */
+@media(max-width: 768px){
+    #cv {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .left, .right {
+        width: 100%;
+    }
 }
 
 /* BUTTON */
 button {
     padding: 10px;
-    margin-top: 10px;
+    margin: 5px 0;
     background: black;
     color: white;
     border: none;
     cursor: pointer;
 }
+
+.watermark {
+    text-align: center;
+    font-size: 12px;
+}
 </style>
 </head>
 
 <body>
-<footer style="margin-top:20px; padding:15px; background:#0a0f1c; color:#00ffcc; text-align:center;">
-    ISO YAWI ⚡ School of Electrical Engineering ⚡ PNG University of Technology<br>
-    <em style="color:#aaa;">Building cool projects for students</em>
-</footer>
+
 <div class="form-container">
-    <h2>CV Builder</h2>
 
-    <input id="name" placeholder="Full Name">
-    <input id="phone" placeholder="Phone Number">
-    <input id="email" placeholder="Email">
-    <input id="address" placeholder="Residential Address">
+<h2>CV Builder</h2>
 
-    <h3>Experience</h3>
-    <textarea id="job1" placeholder="Job 1"></textarea>
-    <textarea id="job2" placeholder="Job 2"></textarea>
-    <textarea id="job3" placeholder="Job 3"></textarea>
+<input id="name" placeholder="Full Name">
+<input id="phone" placeholder="Phone Number">
+<input id="email" placeholder="Email">
+<input id="address" placeholder="Residential Address">
 
-    <h3>Education</h3>
-    <textarea id="education"></textarea>
+<!-- EXPERIENCE -->
+<h3>Experience</h3>
+<div id="jobsContainer"></div>
+<button onclick="addJob()">+ Add Job</button>
 
-    <h3>Achievements</h3>
-    <textarea id="achievements"></textarea>
+<!-- EDUCATION -->
+<h3>Education</h3>
+<div id="educationContainer"></div>
+<button onclick="addEducation()">+ Add Education</button>
 
-    <h3>Theme Color</h3>
-    <input type="color" id="colorPicker" value="#2c3e50">
+<h3>Achievements</h3>
+<textarea id="achievements"></textarea>
 
-    <button onclick="generateCV()">Generate CV</button>
-    <button onclick="downloadPDF()">Download PDF</button>
+<h3>Theme Color</h3>
+<input type="color" id="colorPicker" value="#2c3e50">
+
+<button onclick="generateCV()">Generate CV</button>
+<button onclick="downloadPDF()">Download PDF</button>
+
 </div>
 
 <!-- CV OUTPUT -->
 <div id="cv">
 
-    <div class="left" id="leftSide">
-        <h3>SUMMARY</h3>
-        <p id="summary"></p>
+<div class="left" id="leftSide">
+    <h3>SUMMARY</h3>
+    <p id="summary"></p>
 
-        <h3>KEY ACHIEVEMENTS</h3>
-        <p id="outputAchievements"></p>
-    </div>
+    <h3>KEY ACHIEVEMENTS</h3>
+    <p id="outputAchievements"></p>
+</div>
 
-    <div class="right">
-        <h1 id="outName"></h1>
-        <p id="outContact"></p>
+<div class="right">
+    <h1 id="outName"></h1>
+    <p id="outContact"></p>
 
-        <h3>EXPERIENCE</h3>
-        <p id="outJobs"></p>
+    <h3>EXPERIENCE</h3>
+    <div id="outJobs"></div>
 
-        <h3>EDUCATION</h3>
-        <p id="outEducation"></p>
-    </div>
+    <h3>EDUCATION</h3>
+    <div id="outEducation"></div>
+</div>
+
 </div>
 
 <div class="watermark">
-    Powered by: ISO YAWI | PRODUCT CREATOR
+Powered by: ISO YAWI | PRODUCT CREATOR
 </div>
 
 <script>
 
-// AUTO SUMMARY GENERATOR (SMART SYSTEM)
-function generateSummary(jobs, achievements) {
-    return "Results-driven professional with experience in " + jobs.slice(0,80) +
-    ". Proven track record in " + achievements.slice(0,80) +
-    ". Strong ability to deliver results, manage operations, and drive growth.";
+let jobCount = 0;
+let eduCount = 0;
+
+/* ADD JOB */
+function addJob(){
+    if(jobCount >= 10) return alert("Max 10 jobs");
+
+    let div = document.createElement("div");
+    div.className = "section-box";
+
+    div.innerHTML = `
+        <input placeholder="Company">
+        <input placeholder="Position">
+        <input placeholder="Year Start">
+        <input placeholder="Year End">
+        <textarea placeholder="Responsibilities"></textarea>
+        <button onclick="this.parentElement.remove()">Remove</button>
+    `;
+
+    document.getElementById("jobsContainer").appendChild(div);
+    jobCount++;
 }
 
-// GENERATE CV
-function generateCV() {
+/* ADD EDUCATION */
+function addEducation(){
 
-    let name = document.getElementById("name").value;
-    let phone = document.getElementById("phone").value;
-    let email = document.getElementById("email").value;
-    let address = document.getElementById("address").value;
+    let div = document.createElement("div");
+    div.className = "section-box";
 
-    let job1 = document.getElementById("job1").value;
-    let job2 = document.getElementById("job2").value;
-    let job3 = document.getElementById("job3").value;
+    div.innerHTML = `
+        <input placeholder="Institution">
+        <input placeholder="Year Started">
+        <input placeholder="Year Ended">
+        <label><input type="checkbox"> Currently Studying</label>
+        <button onclick="this.parentElement.remove()">Remove</button>
+    `;
 
-    let education = document.getElementById("education").value;
-    let achievements = document.getElementById("achievements").value;
+    document.getElementById("educationContainer").appendChild(div);
+    eduCount++;
+}
+
+/* AUTO SUMMARY */
+function generateSummary(text, achievements){
+    return "Results-driven professional with experience in " + text.slice(0,80) +
+    ". Proven track record in " + achievements.slice(0,80) +
+    ". Strong leadership, operational excellence, and growth delivery.";
+}
+
+/* GENERATE CV */
+function generateCV(){
 
     let color = document.getElementById("colorPicker").value;
-
-    // APPLY COLOR
     document.getElementById("leftSide").style.background = color;
 
-    // OUTPUT
-    document.getElementById("outName").innerText = name;
-    document.getElementById("outContact").innerText = phone + " | " + email + " | " + address;
+    document.getElementById("outName").innerText =
+        document.getElementById("name").value;
 
-    document.getElementById("outJobs").innerText =
-        job1 + "\n\n" + job2 + "\n\n" + job3;
+    document.getElementById("outContact").innerText =
+        document.getElementById("phone").value + " | " +
+        document.getElementById("email").value + " | " +
+        document.getElementById("address").value;
 
-    document.getElementById("outEducation").innerText = education;
+    /* JOBS OUTPUT */
+    let jobs = document.querySelectorAll("#jobsContainer .section-box");
+    let jobsHTML = "";
+    let jobText = "";
+
+    jobs.forEach(job=>{
+        let inputs = job.querySelectorAll("input, textarea");
+
+        jobsHTML += `
+        <p><b>${inputs[1].value}</b> - ${inputs[0].value}<br>
+        ${inputs[2].value} - ${inputs[3].value}<br>
+        ${inputs[4].value}</p>
+        `;
+
+        jobText += inputs[1].value + " " + inputs[0].value + " ";
+    });
+
+    document.getElementById("outJobs").innerHTML = jobsHTML;
+
+    /* EDUCATION OUTPUT */
+    let edus = document.querySelectorAll("#educationContainer .section-box");
+    let eduHTML = "";
+
+    edus.forEach(edu=>{
+        let inputs = edu.querySelectorAll("input");
+
+        let current = inputs[3].checked ? "Present" : inputs[2].value;
+
+        eduHTML += `
+        <p><b>${inputs[0].value}</b><br>
+        ${inputs[1].value} - ${current}</p>
+        `;
+    });
+
+    document.getElementById("outEducation").innerHTML = eduHTML;
+
+    let achievements = document.getElementById("achievements").value;
     document.getElementById("outputAchievements").innerText = achievements;
 
-    // AUTO SUMMARY
-    let summary = generateSummary(job1 + job2 + job3, achievements);
+    let summary = generateSummary(jobText, achievements);
     document.getElementById("summary").innerText = summary;
 }
 
-// DOWNLOAD PDF
-function downloadPDF() {
-    const element = document.getElementById("cv");
-
-    html2pdf()
-    .from(element)
-    .save("My_CV.pdf");
+/* DOWNLOAD PDF */
+function downloadPDF(){
+    html2pdf().from(document.getElementById("cv")).save("CV.pdf");
 }
 
 </script>
+
 <footer style="margin-top:20px; padding:15px; background:#0a0f1c; color:#00ffcc; text-align:center;">
-    ISO YAWI ⚡ School of Electrical Engineering ⚡ PNG University of Technology<br>
-    <em style="color:#aaa;">Building cool projects for students</em>
+ISO YAWI ⚡ School of Electrical Engineering ⚡ PNG University of Technology
 </footer>
 
 </body>
