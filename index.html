@@ -8,36 +8,86 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
+
+/* ===================== BACKGROUND ===================== */
 body {
-    font-family: Arial;
     margin: 0;
-    background: #f4f4f4;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e293b, #0a0f1c);
+    color: white;
 }
 
-/* FORM */
+/* ===================== HEADER (GLASS) ===================== */
+header {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(12px);
+    background: rgba(0,0,0,0.4);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 15px;
+    text-align: center;
+    z-index: 1000;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+    letter-spacing: 2px;
+}
+
+header h3 {
+    margin: 5px 0;
+    font-weight: normal;
+    color: #00ffcc;
+}
+
+/* ===================== FORM ===================== */
 .form-container {
+    width: 90%;
+    max-width: 900px;
+    margin: 20px auto;
     padding: 20px;
-    background: white;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(15px);
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 input, textarea {
     width: 100%;
     padding: 10px;
-    margin: 5px 0;
+    margin: 6px 0;
+    border-radius: 8px;
+    border: none;
+    outline: none;
 }
 
-.section-box {
-    border: 1px solid #ddd;
+/* ===================== BUTTON ===================== */
+button {
     padding: 10px;
-    margin-bottom: 10px;
+    margin: 5px 0;
+    background: #00ffcc;
+    color: black;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-/* CV */
+button:hover {
+    background: #00c9a7;
+}
+
+/* ===================== CV OUTPUT ===================== */
 #cv {
     width: 900px;
     margin: 20px auto;
     display: flex;
     background: white;
+    color: black;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 /* LEFT */
@@ -53,7 +103,15 @@ input, textarea {
     padding: 20px;
 }
 
-/* MOBILE VERSION */
+/* ===================== GLASS BOX ===================== */
+.section-box {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+/* ===================== MOBILE ===================== */
 @media(max-width: 768px){
     #cv {
         flex-direction: column;
@@ -65,46 +123,40 @@ input, textarea {
     }
 }
 
-/* BUTTON */
-button {
-    padding: 10px;
-    margin: 5px 0;
-    background: black;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
+/* ===================== WATERMARK ===================== */
 .watermark {
     text-align: center;
     font-size: 12px;
+    margin-bottom: 20px;
+    color: #aaa;
 }
+
 </style>
 </head>
 
 <body>
+
 <header>
     <h1>ISO YAWI</h1>
-    <h3>Building Cool Products</h3>
+    <h3>Engineering • Software • Innovation</h3>
     <div style="font-size:13px;">
-        📧 Email: iso.yawi111@gmail.com | 📱 Phone: NA | PNG University of Technology
+        📧 iso.yawi111@gmail.com | 📱 PNG University of Technology
     </div>
 </header>
+
 <div class="form-container">
 
-<h2>CV Builder</h2>
+<h2>CV Builder (Professional Glass Edition)</h2>
 
 <input id="name" placeholder="Full Name">
 <input id="phone" placeholder="Phone Number">
 <input id="email" placeholder="Email">
-<input id="address" placeholder="Residential Address">
+<input id="address" placeholder="Address">
 
-<!-- EXPERIENCE -->
 <h3>Experience</h3>
 <div id="jobsContainer"></div>
 <button onclick="addJob()">+ Add Job</button>
 
-<!-- EDUCATION -->
 <h3>Education</h3>
 <div id="educationContainer"></div>
 <button onclick="addEducation()">+ Add Education</button>
@@ -120,7 +172,7 @@ button {
 
 </div>
 
-<!-- CV OUTPUT -->
+<!-- ===================== CV ===================== -->
 <div id="cv">
 
 <div class="left" id="leftSide">
@@ -145,15 +197,15 @@ button {
 </div>
 
 <div class="watermark">
-Powered by: ISO YAWI | PRODUCT CREATOR
+Powered by ISO YAWI | CV BUILDER SYSTEM
 </div>
 
 <script>
 
 let jobCount = 0;
 let eduCount = 0;
+let isGenerated = false;   // ✅ IMPORTANT LOCK
 
-/* ADD JOB */
 function addJob(){
     if(jobCount >= 10) return alert("Max 10 jobs");
 
@@ -173,7 +225,6 @@ function addJob(){
     jobCount++;
 }
 
-/* ADD EDUCATION */
 function addEducation(){
 
     let div = document.createElement("div");
@@ -191,11 +242,11 @@ function addEducation(){
     eduCount++;
 }
 
-/* AUTO SUMMARY */
+/* SUMMARY */
 function generateSummary(text, achievements){
     return "Results-driven professional with experience in " + text.slice(0,80) +
     ". Proven track record in " + achievements.slice(0,80) +
-    ". Strong leadership, operational excellence, and growth delivery.";
+    ". Strong leadership, engineering and problem-solving skills.";
 }
 
 /* GENERATE CV */
@@ -212,7 +263,7 @@ function generateCV(){
         document.getElementById("email").value + " | " +
         document.getElementById("address").value;
 
-    /* JOBS OUTPUT */
+    /* JOBS */
     let jobs = document.querySelectorAll("#jobsContainer .section-box");
     let jobsHTML = "";
     let jobText = "";
@@ -231,7 +282,7 @@ function generateCV(){
 
     document.getElementById("outJobs").innerHTML = jobsHTML;
 
-    /* EDUCATION OUTPUT */
+    /* EDUCATION */
     let edus = document.querySelectorAll("#educationContainer .section-box");
     let eduHTML = "";
 
@@ -253,18 +304,43 @@ function generateCV(){
 
     let summary = generateSummary(jobText, achievements);
     document.getElementById("summary").innerText = summary;
+
+    isGenerated = true; // ✅ ENABLE DOWNLOAD
 }
 
-/* DOWNLOAD PDF */
+/* DOWNLOAD PDF (LOCKED) */
 function downloadPDF(){
+
+    if(!isGenerated){
+        alert("Please generate CV first before downloading!");
+        return;
+    }
+
     html2pdf().from(document.getElementById("cv")).save("CV.pdf");
 }
 
 </script>
+<!-- ===================== FOOTER ===================== -->
+<footer style="
+    margin-top: 30px;
+    padding: 18px;
+    text-align: center;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    color: #00ffcc;
+    font-size: 13px;
+    letter-spacing: 1px;
+">
 
-<footer style="margin-top:20px; padding:15px; background:#0a0f1c; color:#00ffcc; text-align:center;">
-ISO YAWI ⚡ School of Electrical Engineering ⚡ PNG University of Technology
+    <div style="margin-bottom:5px;">
+        ⚡ ISO YAWI • Engineering Innovation System ⚡
+    </div>
+
+    <div style="color:#aaa;">
+        Electrical Engineering • Software Development • Telecommunications • PNG University of Technology
+    </div>
+
 </footer>
-
 </body>
 </html>
