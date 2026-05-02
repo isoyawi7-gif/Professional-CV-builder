@@ -8,6 +8,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
+
+html { scroll-behavior: smooth; }
+
 body {
     margin: 0;
     font-family: Arial;
@@ -90,6 +93,12 @@ footer {
     background: #111827;
     color: #00ffcc;
 }
+
+hr {
+    border: 0;
+    border-top: 1px solid #ccc;
+}
+
 </style>
 </head>
 
@@ -111,21 +120,21 @@ footer {
 
 <h3>Jobs</h3>
 <div id="jobBox"></div>
-<button onclick="addJob()">Add Job</button>
+<button type="button" onclick="addJob()">Add Job</button>
 
 <h3>Education</h3>
 <div id="eduBox"></div>
-<button onclick="addEdu()">Add Education</button>
+<button type="button" onclick="addEdu()">Add Education</button>
 
 <h3>Referees</h3>
 <div id="refBox"></div>
-<button onclick="addRef()">Add Referee</button>
+<button type="button" onclick="addRef()">Add Referee</button>
 
 <h3>Key Achievements</h3>
 <textarea id="achievements"></textarea>
 
-<button onclick="generateCV()">Generate CV</button>
-<button onclick="downloadPDF()">Download PDF</button>
+<button type="button" onclick="generateCV()">Generate CV</button>
+<button type="button" onclick="downloadPDF()">Download PDF</button>
 
 </div>
 
@@ -161,7 +170,7 @@ footer {
 
 </div>
 
-<div id="watermark">Powered by IsoYawi</div>
+<div id="watermark">Powered by IsoYawi | Product Creator</div>
 
 <footer>ISO YAWI CV BUILDER SYSTEM</footer>
 
@@ -171,10 +180,13 @@ footer {
 
 let ready = false;
 
-/* VALIDATION FUNCTION */
+/* SAFE GETTERS */
+const get = id => document.getElementById(id);
+
+/* VALIDATION */
 function validateInputs(){
 
-if(!name.value || !phone.value || !email.value || !address.value){
+if(!get("name").value || !get("phone").value || !get("email").value || !get("address").value){
 alert("Fill all personal details!");
 return false;
 }
@@ -194,7 +206,6 @@ alert("Add at least 1 referee!");
 return false;
 }
 
-/* CHECK EMPTY FIELDS INSIDE BOXES */
 let allFilled = true;
 document.querySelectorAll(".box input, .box textarea").forEach(x=>{
 if(!x.value.trim()) allFilled = false;
@@ -205,7 +216,7 @@ alert("No empty fields allowed!");
 return false;
 }
 
-if(!achievements.value.trim()){
+if(!get("achievements").value.trim()){
 alert("Enter achievements!");
 return false;
 }
@@ -213,7 +224,7 @@ return false;
 return true;
 }
 
-/* ADD FUNCTIONS */
+/* ADD */
 function addJob(){
 let d=document.createElement("div");
 d.className="box";
@@ -224,7 +235,7 @@ d.innerHTML=`
 <input placeholder="End Date">
 <textarea placeholder="Responsibilities"></textarea>
 `;
-jobBox.appendChild(d);
+get("jobBox").appendChild(d);
 }
 
 function addEdu(){
@@ -236,7 +247,7 @@ d.innerHTML=`
 <input placeholder="End Year">
 <input placeholder="Qualification">
 `;
-eduBox.appendChild(d);
+get("eduBox").appendChild(d);
 }
 
 function addRef(){
@@ -248,12 +259,7 @@ d.innerHTML=`
 <input placeholder="Company">
 <input placeholder="Contact">
 `;
-refBox.appendChild(d);
-}
-
-/* SUMMARY */
-function autoSummary(){
-return name.value + " is a results-driven professional with strong experience in engineering, leadership, and operations.";
+get("refBox").appendChild(d);
 }
 
 /* GENERATE */
@@ -261,8 +267,12 @@ function generateCV(){
 
 if(!validateInputs()) return;
 
-outName.innerText = name.value;
-contact.innerText = phone.value+" | "+email.value+" | "+address.value;
+get("outName").innerText = get("name").value;
+
+get("contact").innerText =
+get("phone").value + " | " +
+get("email").value + " | " +
+get("address").value;
 
 /* JOBS */
 let j="";
@@ -270,7 +280,7 @@ document.querySelectorAll("#jobBox .box").forEach(x=>{
 let i=x.querySelectorAll("input,textarea");
 j+=`<p><b>${i[1].value}</b> - ${i[0].value}<br>${i[2].value} → ${i[3].value}<br>${i[4].value}</p>`;
 });
-jobOut.innerHTML=j;
+get("jobOut").innerHTML=j;
 
 /* EDU */
 let e="";
@@ -278,7 +288,7 @@ document.querySelectorAll("#eduBox .box").forEach(x=>{
 let i=x.querySelectorAll("input");
 e+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>${i[3].value}</p>`;
 });
-eduOut.innerHTML=e;
+get("eduOut").innerHTML=e;
 
 /* REF */
 let r="";
@@ -286,14 +296,19 @@ document.querySelectorAll("#refBox .box").forEach(x=>{
 let i=x.querySelectorAll("input");
 r+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>${i[3].value}</p>`;
 });
-refOut.innerHTML=r;
+get("refOut").innerHTML=r;
 
 /* ACH */
-achOut.innerHTML = achievements.value.split("\n").map(x=>"• "+x).join("<br>");
+get("achOut").innerHTML =
+get("achievements").value.split("\n").map(x=>"• "+x).join("<br>");
 
-summary.innerText = autoSummary();
+get("summary").innerText =
+get("name").value + " is a results-driven professional with strong experience in engineering, leadership, and operations.";
 
 ready = true;
+
+/* SCROLL TO CV */
+window.scrollTo(0, get("cvWrapper").offsetTop);
 
 alert("CV Generated Successfully!");
 }
@@ -312,17 +327,17 @@ html2pdf()
 margin: 0,
 filename: "CV.pdf",
 image: { type: "jpeg", quality: 1 },
-html2canvas: { scale: 2 },
+html2canvas: { scale: 2, useCORS: true },
 jsPDF: { unit: "px", format: [900, 1200] }
 })
-.from(cvWrapper)
+.from(get("cvWrapper"))
 .save();
-},600);
+},800);
 
 }
 
 /* COLOR */
-colorPicker.addEventListener("input",function(){
+get("colorPicker").addEventListener("input",function(){
 document.querySelector(".left").style.background=this.value;
 });
 
