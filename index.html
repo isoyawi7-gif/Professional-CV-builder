@@ -17,12 +17,37 @@ body {
     color: white;
 }
 
+/* ===================== GLASS HEADER (UI ONLY) ===================== */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    backdrop-filter: blur(12px);
+    background: rgba(0,0,0,0.35);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+
+    padding: 15px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+header h3 {
+    margin: 5px 0;
+    color: #00ffcc;
+}
+
 /* ===================== FORM ===================== */
 .form-container {
     width: 90%;
     max-width: 900px;
     margin: 20px auto;
     padding: 20px;
+
     background: rgba(255,255,255,0.08);
     backdrop-filter: blur(15px);
     border-radius: 15px;
@@ -48,30 +73,12 @@ button {
     cursor: pointer;
 }
 
-/* ===================== PDF DOCUMENT WRAPPER ===================== */
+/* ===================== PDF WRAPPER ===================== */
 #cvDocument {
     width: 900px;
     margin: auto;
     background: white;
     color: black;
-}
-
-/* ===================== HEADER ===================== */
-header {
-    text-align: center;
-    padding: 15px;
-    background: #111827;
-    color: white;
-}
-
-header h1 {
-    margin: 0;
-    letter-spacing: 2px;
-}
-
-header h3 {
-    margin: 5px 0;
-    color: #00ffcc;
 }
 
 /* ===================== CV ===================== */
@@ -111,6 +118,15 @@ footer {
 
 <body>
 
+<!-- ===================== HEADER (GLASS UI ONLY) ===================== -->
+<header>
+    <h1>ISO YAWI</h1>
+    <h3>Engineering • Software • Innovation</h3>
+    <div style="font-size:13px;">
+        📧 iso.yawi111@gmail.com | 📱 PNG University of Technology
+    </div>
+</header>
+
 <!-- ===================== FORM ===================== -->
 <div class="form-container">
 
@@ -128,19 +144,9 @@ footer {
 
 </div>
 
-<!-- ===================== FULL PDF AREA ===================== -->
+<!-- ===================== PDF ONLY CONTENT ===================== -->
 <div id="cvDocument">
 
-<!-- HEADER (NOW INCLUDED IN PDF) -->
-<header>
-    <h1>ISO YAWI</h1>
-    <h3>Engineering • Software • Innovation</h3>
-    <div style="font-size:13px;">
-        📧 iso.yawi111@gmail.com | 📱 PNG University of Technology
-    </div>
-</header>
-
-<!-- CV CONTENT -->
 <div id="cv">
 
 <div class="left">
@@ -158,7 +164,6 @@ footer {
 
 </div>
 
-<!-- FOOTER (NOW INCLUDED IN PDF ✔) -->
 <footer>
     ⚡ ISO YAWI • Engineering Innovation System ⚡<br>
     Electrical Engineering • Software Development • Telecommunications • PNGUoT
@@ -185,12 +190,12 @@ function generateCV(){
         document.getElementById("achievements").value;
 
     document.getElementById("summary").innerText =
-        "Electrical Engineer with expertise in telecom systems, IT infrastructure, and network deployment.";
+        "Electrical Engineer specializing in telecom systems, IT infrastructure, and network deployment.";
 
     isGenerated = true;
 }
 
-/* ===================== PDF DOWNLOAD FIXED ===================== */
+/* ===================== PDF FIX ===================== */
 function downloadPDF(){
 
     if(!isGenerated){
