@@ -3,38 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CV Builder - FIXED</title>
+<title>CV Builder FIXED PDF</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 
-/* ===================== BACKGROUND ===================== */
 body {
     margin: 0;
     font-family: Arial;
-    background: linear-gradient(135deg, #0f172a, #1e293b, #0a0f1c);
+    background: #0f172a;
     color: white;
 }
 
-/* ===================== HEADER ===================== */
+/* HEADER */
 header {
-    position: sticky;
-    top: 0;
     background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(12px);
     padding: 15px;
     text-align: center;
 }
 
-/* ===================== FORM ===================== */
+/* FORM */
 .form-container {
     width: 90%;
     max-width: 900px;
     margin: auto;
     padding: 20px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 10px;
 }
 
 input, textarea {
@@ -43,48 +37,47 @@ input, textarea {
     margin: 5px 0;
 }
 
-/* ===================== BUTTON ===================== */
+/* BUTTON */
 button {
     padding: 10px;
     background: #00ffcc;
     border: none;
     cursor: pointer;
-    margin: 5px 0;
 }
 
-/* ===================== PDF WRAPPER (IMPORTANT FIX) ===================== */
+/* ===================== IMPORTANT FIX ===================== */
 #cvWrapper {
     width: 900px;
     margin: auto;
     background: white;
     color: black;
+    padding: 10px;
 }
 
-/* ===================== CV ===================== */
+/* REMOVE FLEX DURING PDF RENDER (critical fix) */
 #cv {
-    display: flex;
+    display: block;
+}
+
+/* PDF SAFE LAYOUT */
+.left, .right {
+    width: 100%;
+    padding: 10px;
 }
 
 .left {
-    width: 30%;
     background: #1f2937;
     color: white;
-    padding: 15px;
 }
 
-.right {
-    width: 70%;
-    padding: 15px;
-}
-
-/* ===================== BOX ===================== */
+/* BOX */
 .box {
     background: #f3f4f6;
     padding: 10px;
     margin: 5px 0;
 }
 
-/* ===================== FOOTER ===================== */
+/* FOOTER */
 footer {
     text-align: center;
     padding: 15px;
@@ -98,15 +91,7 @@ footer {
 <body>
 
 <header>
-<!-- ===================== HEADER (GLASS UI ONLY) ===================== -->
-
-    <h1>ISO YAWI</h1>
-    <h3>Engineering • Software • Innovation</h3>
-    <div style="font-size:13px;">
-        📧 iso.yawi111@gmail.com | 📱 PNG University of Technology
-    </div>
-
-<h2>PRoFESSIONAL CV BUILDER SYSTEM</h2>
+<h2>CV BUILDER SYSTEM</h2>
 </header>
 
 <div class="form-container">
@@ -128,14 +113,14 @@ footer {
 <div id="refBox"></div>
 <button onclick="addRef()">Add Referee</button>
 
-<textarea id="achievements" placeholder="Achievements"></textarea>
+<textarea id="achievements"></textarea>
 
 <button onclick="generateCV()">Generate CV</button>
 <button onclick="downloadPDF()">Download PDF</button>
 
 </div>
 
-<!-- ===================== PDF AREA ===================== -->
+<!-- ===================== CV ===================== -->
 <div id="cvWrapper">
 
 <div id="cv">
@@ -165,110 +150,108 @@ footer {
 </div>
 </div>
 
-<footer>
-ISO YAWI CV BUILDER SYSTEM
-</footer>
+<footer>ISO YAWI CV BUILDER SYSTEM</footer>
 
 </div>
 
 <script>
 
-let generated = false;
+let ready=false;
 
-/* ===================== JOB ===================== */
+/* JOB */
 function addJob(){
-let div = document.createElement("div");
-div.className="box";
-div.innerHTML=`
+let d=document.createElement("div");
+d.className="box";
+d.innerHTML=`
 <input placeholder="Company">
 <input placeholder="Position">
-<input placeholder="Start Month/Year">
-<input placeholder="End Month/Year or 'Present'">
+<input placeholder="Start (Month/Year)">
+<input placeholder="End (or Present)">
 <textarea placeholder="Responsibilities"></textarea>
-<button onclick="this.parentElement.remove()">Remove</button>
 `;
-document.getElementById("jobBox").appendChild(div);
+document.getElementById("jobBox").appendChild(d);
 }
 
-/* ===================== EDUCATION ===================== */
+/* EDU */
 function addEdu(){
-let div = document.createElement("div");
-div.className="box";
-div.innerHTML=`
+let d=document.createElement("div");
+d.className="box";
+d.innerHTML=`
 <input placeholder="Institution">
 <input placeholder="Start Year">
-<input placeholder="End Year or 'Present'">
-<input placeholder="Expected Graduation (if studying)">
-<button onclick="this.parentElement.remove()">Remove</button>
+<input placeholder="End Year or Present">
+<input placeholder="Expected Graduation">
 `;
-document.getElementById("eduBox").appendChild(div);
+document.getElementById("eduBox").appendChild(d);
 }
 
-/* ===================== REFEREE ===================== */
+/* REF */
 function addRef(){
-let div = document.createElement("div");
-div.className="box";
-div.innerHTML=`
+let d=document.createElement("div");
+d.className="box";
+d.innerHTML=`
 <input placeholder="Name">
 <input placeholder="Position">
 <input placeholder="Company">
 <input placeholder="Contact">
-<button onclick="this.parentElement.remove()">Remove</button>
 `;
-document.getElementById("refBox").appendChild(div);
+document.getElementById("refBox").appendChild(d);
 }
 
-/* ===================== GENERATE ===================== */
+/* GENERATE */
 function generateCV(){
 
-document.getElementById("outName").innerText =
+document.getElementById("outName").innerText=
 document.getElementById("name").value;
 
-document.getElementById("contact").innerText =
+document.getElementById("contact").innerText=
 document.getElementById("phone").value+" | "+
 document.getElementById("email").value+" | "+
 document.getElementById("address").value;
 
-/* JOBS */
-let jobHTML="";
-document.querySelectorAll("#jobBox .box").forEach(j=>{
-let i=j.querySelectorAll("input,textarea");
-jobHTML+=`<p><b>${i[1].value}</b> - ${i[0].value}<br>${i[2].value} to ${i[3].value}<br>${i[4].value}</p>`;
+/* JOB */
+let j="";
+document.querySelectorAll("#jobBox .box").forEach(x=>{
+let i=x.querySelectorAll("input,textarea");
+j+=`<p><b>${i[1].value}</b> - ${i[0].value}<br>${i[2].value} to ${i[3].value}<br>${i[4].value}</p>`;
 });
-document.getElementById("jobOut").innerHTML=jobHTML;
+document.getElementById("jobOut").innerHTML=j;
 
-/* EDUCATION */
-let eduHTML="";
-document.querySelectorAll("#eduBox .box").forEach(e=>{
-let i=e.querySelectorAll("input");
-eduHTML+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>Expected: ${i[3].value}</p>`;
+/* EDU */
+let e="";
+document.querySelectorAll("#eduBox .box").forEach(x=>{
+let i=x.querySelectorAll("input");
+e+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>Expected: ${i[3].value}</p>`;
 });
-document.getElementById("eduOut").innerHTML=eduHTML;
+document.getElementById("eduOut").innerHTML=e;
 
 /* REF */
-let refHTML="";
-document.querySelectorAll("#refBox .box").forEach(r=>{
-let i=r.querySelectorAll("input");
-refHTML+=`<p><b>${i[0].value}</b><br>${i[1].value}, ${i[2].value}<br>${i[3].value}</p>`;
+let r="";
+document.querySelectorAll("#refBox .box").forEach(x=>{
+let i=x.querySelectorAll("input");
+r+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>${i[3].value}</p>`;
 });
-document.getElementById("refOut").innerHTML=refHTML;
+document.getElementById("refOut").innerHTML=r;
 
-document.getElementById("achOut").innerText =
+document.getElementById("achOut").innerText=
 document.getElementById("achievements").value;
 
-document.getElementById("summary").innerText =
-"Engineering professional with strong telecom and IT experience.";
+document.getElementById("summary").innerText=
+"Engineering professional with telecom and IT experience.";
 
-generated=true;
+ready=true;
 }
 
-/* ===================== PDF FIX ===================== */
+/* ===================== FIXED PDF EXPORT ===================== */
 function downloadPDF(){
 
-if(!generated){
+if(!ready){
 alert("Generate CV first");
 return;
 }
+
+/* FORCE DOM RENDER BEFORE CAPTURE (CRITICAL FIX) */
+setTimeout(()=>{
 
 const element=document.getElementById("cvWrapper");
 
@@ -279,13 +262,16 @@ image:{type:"jpeg",quality:1},
 html2canvas:{
 scale:2,
 backgroundColor:"#ffffff",
-useCORS:true
+useCORS:true,
+scrollY:0
 },
 jsPDF:{
 unit:"px",
 format:[900,1200]
 }
 }).from(element).save();
+
+},300);
 
 }
 
