@@ -58,7 +58,7 @@ button {
     position: relative;
 }
 
-#cv { display: flex; }
+#cv { display: block; }
 
 .left {
     width: 35%;
@@ -321,18 +321,40 @@ alert("Generate CV first!");
 return;
 }
 
+const element = get("cvWrapper");
+
+/* 🔥 TEMP FIX: force layout before capture */
+const originalDisplay = element.style.display;
+element.style.display = "block";
+
+/* 🔥 Force reflow (important trick) */
+element.offsetHeight;
+
 setTimeout(()=>{
+
 html2pdf()
 .set({
-margin: 0,
+margin: 10,
 filename: "CV.pdf",
 image: { type: "jpeg", quality: 1 },
-html2canvas: { scale: 2, useCORS: true },
-jsPDF: { unit: "px", format: [900, 1200] }
+html2canvas: { 
+    scale: 2,
+    useCORS: true,
+    letterRendering: true
+},
+jsPDF: { 
+    unit: "mm", 
+    format: "a4", 
+    orientation: "portrait" 
+}
 })
-.from(get("cvWrapper"))
-.save();
-},800);
+.from(element)
+.save()
+.then(()=>{
+    element.style.display = originalDisplay;
+});
+
+}, 500);
 
 }
 
