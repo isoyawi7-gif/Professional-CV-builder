@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CV Builder FIXED PDF</title>
+<title>Advanced CV Builder System</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -18,23 +18,25 @@ body {
 
 /* HEADER */
 header {
-    background: rgba(0,0,0,0.4);
     padding: 15px;
     text-align: center;
+    background: rgba(0,0,0,0.5);
 }
 
 /* FORM */
 .form-container {
     width: 90%;
-    max-width: 900px;
+    max-width: 1000px;
     margin: auto;
     padding: 20px;
 }
 
-input, textarea {
+input, textarea, select {
     width: 100%;
     padding: 10px;
     margin: 5px 0;
+    border-radius: 5px;
+    border: none;
 }
 
 /* BUTTON */
@@ -42,32 +44,36 @@ button {
     padding: 10px;
     background: #00ffcc;
     border: none;
+    margin-top: 5px;
     cursor: pointer;
+    font-weight: bold;
 }
 
-/* ===================== IMPORTANT FIX ===================== */
+/* ================= CV STYLE ================= */
 #cvWrapper {
     width: 900px;
     margin: auto;
     background: white;
     color: black;
-    padding: 10px;
+    padding: 20px;
+    position: relative;
 }
 
-/* REMOVE FLEX DURING PDF RENDER (critical fix) */
+/* LAYOUT */
 #cv {
-    display: block;
-}
-
-/* PDF SAFE LAYOUT */
-.left, .right {
-    width: 100%;
-    padding: 10px;
+    display: flex;
 }
 
 .left {
+    width: 35%;
     background: #1f2937;
     color: white;
+    padding: 15px;
+}
+
+.right {
+    width: 65%;
+    padding: 15px;
 }
 
 /* BOX */
@@ -75,6 +81,18 @@ button {
     background: #f3f4f6;
     padding: 10px;
     margin: 5px 0;
+}
+
+/* WATERMARK */
+#watermark {
+    position: absolute;
+    bottom: 12px;
+    right: 15px;
+    font-size: 12px;
+    opacity: 0.4;
+    font-weight: bold;
+    color: #111;
+    pointer-events: none;
 }
 
 /* FOOTER */
@@ -91,15 +109,18 @@ footer {
 <body>
 
 <header>
-<h2>CV BUILDER SYSTEM</h2>
+<h2>ADVANCED CV BUILDER SYSTEM</h2>
 </header>
 
 <div class="form-container">
 
 <input id="name" placeholder="Full Name">
-<input id="phone" placeholder="Phone">
+<input id="phone" placeholder="Phone Number">
 <input id="email" placeholder="Email">
-<input id="address" placeholder="Address">
+<input id="address" placeholder="Residential Address">
+
+<h3>Select CV Theme Colour</h3>
+<input type="color" id="colorPicker">
 
 <h3>Jobs</h3>
 <div id="jobBox"></div>
@@ -113,6 +134,7 @@ footer {
 <div id="refBox"></div>
 <button onclick="addRef()">Add Referee</button>
 
+<h3>Key Achievements</h3>
 <textarea id="achievements"></textarea>
 
 <button onclick="generateCV()">Generate CV</button>
@@ -120,7 +142,7 @@ footer {
 
 </div>
 
-<!-- ===================== CV ===================== -->
+<!-- ================= CV ================= -->
 <div id="cvWrapper">
 
 <div id="cv">
@@ -129,7 +151,7 @@ footer {
 <h3>SUMMARY</h3>
 <p id="summary"></p>
 
-<h3>ACHIEVEMENTS</h3>
+<h3>KEY ACHIEVEMENTS</h3>
 <p id="achOut"></p>
 </div>
 
@@ -148,7 +170,10 @@ footer {
 <div id="refOut"></div>
 
 </div>
+
 </div>
+
+<div id="watermark">Powered by IsoYawi | Product Creator</div>
 
 <footer>ISO YAWI CV BUILDER SYSTEM</footer>
 
@@ -156,36 +181,36 @@ footer {
 
 <script>
 
-let ready=false;
+let ready = false;
 
-/* JOB */
+/* ADD JOB */
 function addJob(){
 let d=document.createElement("div");
 d.className="box";
 d.innerHTML=`
 <input placeholder="Company">
 <input placeholder="Position">
-<input placeholder="Start (Month/Year)">
-<input placeholder="End (or Present)">
+<input placeholder="Start Date">
+<input placeholder="End Date">
 <textarea placeholder="Responsibilities"></textarea>
 `;
 document.getElementById("jobBox").appendChild(d);
 }
 
-/* EDU */
+/* ADD EDU */
 function addEdu(){
 let d=document.createElement("div");
 d.className="box";
 d.innerHTML=`
 <input placeholder="Institution">
 <input placeholder="Start Year">
-<input placeholder="End Year or Present">
-<input placeholder="Expected Graduation">
+<input placeholder="End Year">
+<input placeholder="Qualification">
 `;
 document.getElementById("eduBox").appendChild(d);
 }
 
-/* REF */
+/* ADD REF */
 function addRef(){
 let d=document.createElement("div");
 d.className="box";
@@ -198,34 +223,44 @@ d.innerHTML=`
 document.getElementById("refBox").appendChild(d);
 }
 
-/* GENERATE */
+/* SUMMARY */
+function autoSummary(){
+let name=document.getElementById("name").value;
+return name + " is a highly skilled professional with experience in engineering, operations, and leadership roles with strong technical capability.";
+}
+
+/* ACHIEVEMENTS */
+function autoAchievements(text){
+return text.split("\n").map(x=>"• "+x).join("<br>");
+}
+
+/* GENERATE CV */
 function generateCV(){
 
-document.getElementById("outName").innerText=
-document.getElementById("name").value;
+document.getElementById("outName").innerText=document.getElementById("name").value;
 
-document.getElementById("contact").innerText=
+document.getElementById("contact").innerText =
 document.getElementById("phone").value+" | "+
 document.getElementById("email").value+" | "+
 document.getElementById("address").value;
 
-/* JOB */
+/* JOBS */
 let j="";
 document.querySelectorAll("#jobBox .box").forEach(x=>{
 let i=x.querySelectorAll("input,textarea");
-j+=`<p><b>${i[1].value}</b> - ${i[0].value}<br>${i[2].value} to ${i[3].value}<br>${i[4].value}</p>`;
+j+=`<p><b>${i[1].value}</b> - ${i[0].value}<br>${i[2].value} → ${i[3].value}<br>${i[4].value}</p>`;
 });
 document.getElementById("jobOut").innerHTML=j;
 
-/* EDU */
+/* EDUCATION */
 let e="";
 document.querySelectorAll("#eduBox .box").forEach(x=>{
 let i=x.querySelectorAll("input");
-e+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>Expected: ${i[3].value}</p>`;
+e+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>${i[3].value}</p>`;
 });
 document.getElementById("eduOut").innerHTML=e;
 
-/* REF */
+/* REFEREES */
 let r="";
 document.querySelectorAll("#refBox .box").forEach(x=>{
 let i=x.querySelectorAll("input");
@@ -233,16 +268,17 @@ r+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>${i[3].value}</p
 });
 document.getElementById("refOut").innerHTML=r;
 
-document.getElementById("achOut").innerText=
-document.getElementById("achievements").value;
+/* ACHIEVEMENTS */
+document.getElementById("achOut").innerHTML =
+autoAchievements(document.getElementById("achievements").value);
 
-document.getElementById("summary").innerText=
-"Engineering professional with telecom and IT experience.";
+/* SUMMARY */
+document.getElementById("summary").innerText=autoSummary();
 
-ready=true;
+ready = true;
 }
 
-/* ===================== FIXED PDF EXPORT ===================== */
+/* PDF DOWNLOAD */
 function downloadPDF(){
 
 if(!ready){
@@ -250,30 +286,24 @@ alert("Generate CV first");
 return;
 }
 
-/* FORCE DOM RENDER BEFORE CAPTURE (CRITICAL FIX) */
 setTimeout(()=>{
-
-const element=document.getElementById("cvWrapper");
 
 html2pdf().set({
 margin:0,
 filename:"CV.pdf",
 image:{type:"jpeg",quality:1},
-html2canvas:{
-scale:2,
-backgroundColor:"#ffffff",
-useCORS:true,
-scrollY:0
-},
-jsPDF:{
-unit:"px",
-format:[900,1200]
-}
-}).from(element).save();
+html2canvas:{scale:2},
+jsPDF:{unit:"px",format:[900,1200]}
+}).from(document.getElementById("cvWrapper")).save();
 
 },300);
 
 }
+
+/* COLOR CHANGE */
+document.getElementById("colorPicker").addEventListener("input",function(){
+document.querySelector(".left").style.background=this.value;
+});
 
 </script>
 
