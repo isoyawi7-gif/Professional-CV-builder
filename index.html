@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> CV Builder SaaS</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+
+/* ===== GLOBAL ===== */
+body {
+    margin: 0;
+    font-family: Arial;
+}
+
+/* ===== HEADER ===== */
+.header {
+    position: sticky;
+    top: 0;
+    background: #020617;
+    color: #00ffcc;
+    padding: 12px 20px;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e293b;
+}
+
+.header h1 {
+    font-size: 18px;
+    margin: 0;
+}
+
+.header span {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* ===== APP ===== */
+.app {
+    display: flex;
+    height: calc(100vh - 60px);
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width: 320px;
+    background: #0f172a;
+    color: white;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.sidebar input, textarea, select {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.sidebar button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    background: #22c55e;
+    border: none;
+    cursor: pointer;
+}
+
+/* ===== PREVIEW ===== */
+.preview {
+    flex: 1;
+    background: #e5e7eb;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* ===== CV ===== */
+.cv {
+    background: white;
+    padding: 30px;
+    max-width: 800px;
+    margin: auto;
+}
+
+/* ===== TEMPLATES ===== */
+.modern h1 { font-size: 28px; }
+.modern .title { border-bottom: 2px solid; }
+
+.classic { font-family: "Times New Roman"; }
+.classic h1 { text-align: center; }
+
+.tech { font-family: monospace; background: #111; color: #0f0; }
+
+/* ===== WATERMARK ===== */
+.watermark {
+    text-align: center;
+    font-size: 11px;
+    margin-top: 20px;
+}
+
+/* ===== REMOVE BTN ===== */
+.remove-btn {
+    background: red;
+    color: white;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+
+    .app {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .preview {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .cv {
+        padding: 15px;
+    }
+
+    .mobile-actions {
+        position: sticky;
+        top: 60px;
+        background: #0f172a;
+        padding: 10px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+    }
+
+    .mobile-actions button {
+        flex: 1;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+  <header>
+    <h1>ISO YAWI</h1>
+    <h3>Building Cool Products</h3>
+    <div style="font-size:13px;">
+        📧 Email: iso.yawi111@gmail.com | 📱 Phone: NA | PNG University of Technology
+    </div>
+</header>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+    <h1>ISO CV Builder ⚡</h1>
+    <span>Professional Resume Generator</span>
+</div>
+
+<div class="app">
+
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar">
+
+<div class="mobile-actions">
+    <button onclick="saveData()">💾 Save</button>
+    <button onclick="downloadPDF()">⬇ PDF</button>
+</div>
+
+<input id="name" placeholder="Full Name">
+<input id="phone" placeholder="Phone">
+<input id="email" placeholder="Email">
+<input id="address" placeholder="Address">
+
+<h3>Jobs</h3>
+<div id="jobs"></div>
+<button onclick="addJob()">+ Add Job</button>
+
+<h3>Education</h3>
+<textarea id="education"></textarea>
+
+<h3>Theme Color</h3>
+<input type="color" id="color">
+
+<h3>Template</h3>
+<select id="template" onchange="updateCV()">
+    <option value="modern">Modern</option>
+    <option value="classic">Classic</option>
+    <option value="tech">Tech</option>
+</select>
+
+<button onclick="saveData()">💾 Save</button>
+<button onclick="downloadPDF()">⬇ Download PDF</button>
+
+</div>
+
+<!-- ===== PREVIEW ===== -->
+<div class="preview">
+<div id="cv"></div>
+</div>
+
+</div>
+
+<script>
+
+/* ===== ADD JOB ===== */
+function addJob(data = {}) {
+    let div = document.createElement("div");
+
+    div.innerHTML = `
+        <input placeholder="Company" value="${data.company || ''}">
+        <input placeholder="Position" value="${data.position || ''}">
+        <textarea placeholder="Description">${data.desc || ''}</textarea>
+        <button class="remove-btn" onclick="this.parentElement.remove(); updateCV()">Remove</button>
+    `;
+
+    document.getElementById("jobs").appendChild(div);
+}
+
+/* ===== SUMMARY ===== */
+function generateSummary(name, count) {
+    if (!name) return "";
+    return `${name} is a results-driven professional with ${count} roles of experience, demonstrating leadership and delivering measurable results.`;
+}
+
+/* ===== ACHIEVEMENTS ===== */
+function generateAchievements(jobs) {
+    return jobs.map(j => `<li>Delivered impact as ${j.position} at ${j.company}</li>`).join("");
+}
+
+/* ===== UPDATE CV ===== */
+function updateCV() {
+
+    let name = nameInput.value;
+    let phone = phoneInput.value;
+    let email = emailInput.value;
+    let address = addressInput.value;
+    let education = educationInput.value;
+    let color = colorInput.value || "#000";
+    let template = templateInput.value;
+
+    let jobDivs = document.querySelectorAll("#jobs > div");
+
+    let jobs = [];
+
+    jobDivs.forEach(div => {
+        let inputs = div.querySelectorAll("input, textarea");
+
+        jobs.push({
+            company: inputs[0].value,
+            position: inputs[1].value,
+            desc: inputs[2].value
+        });
+    });
+
+    let summary = generateSummary(name, jobs.length);
+    let achievements = generateAchievements(jobs);
+
+    let jobHTML = jobs.map(j => `
+        <p><b>${j.position}</b> - ${j.company}</p>
+        <p>${j.desc}</p>
+    `).join("");
+
+    document.getElementById("cv").innerHTML = `
+        <div class="cv ${template}">
+            <h1 style="color:${color}">${name}</h1>
+            <p>${phone} | ${email}</p>
+            <p>${address}</p>
+
+            <div class="title" style="color:${color}">Summary</div>
+            <p>${summary}</p>
+
+            <div class="title" style="color:${color}">Experience</div>
+            ${jobHTML}
+
+            <div class="title" style="color:${color}">Education</div>
+            <p>${education}</p>
+
+            <div class="title" style="color:${color}">Key Achievements</div>
+            <ul>${achievements}</ul>
+
+            <div class="watermark">
+                Powered by: ISO YAWI | PRODUCT CREATOR
+            </div>
+        </div>
+    `;
+}
+
+/* ===== INPUT REFERENCES ===== */
+const nameInput = document.getElementById("name");
+const phoneInput = document.getElementById("phone");
+const emailInput = document.getElementById("email");
+const addressInput = document.getElementById("address");
+const educationInput = document.getElementById("education");
+const colorInput = document.getElementById("color");
+const templateInput = document.getElementById("template");
+
+/* ===== AUTO UPDATE ===== */
+document.addEventListener("input", updateCV);
+
+/* ===== SAVE ===== */
+function saveData() {
+
+    let data = {
+        name: nameInput.value,
+        phone: phoneInput.value,
+        email: emailInput.value,
+        address: addressInput.value,
+        education: educationInput.value,
+        color: colorInput.value,
+        template: templateInput.value,
+        jobs: []
+    };
+
+    document.querySelectorAll("#jobs > div").forEach(div => {
+        let inputs = div.querySelectorAll("input, textarea");
+
+        data.jobs.push({
+            company: inputs[0].value,
+            position: inputs[1].value,
+            desc: inputs[2].value
+        });
+    });
+
+    localStorage.setItem("cvData", JSON.stringify(data));
+    alert("Saved!");
+}
+
+/* ===== LOAD ===== */
+function loadData() {
+
+    let data = JSON.parse(localStorage.getItem("cvData"));
+    if (!data) return;
+
+    nameInput.value = data.name;
+    phoneInput.value = data.phone;
+    emailInput.value = data.email;
+    addressInput.value = data.address;
+    educationInput.value = data.education;
+    colorInput.value = data.color;
+    templateInput.value = data.template;
+
+    document.getElementById("jobs").innerHTML = "";
+
+    data.jobs.forEach(j => addJob(j));
+
+    updateCV();
+}
+
+/* ===== PDF ===== */
+function downloadPDF() {
+    let element = document.getElementById("cv");
+
+    html2pdf().set({
+        margin: 0.5,
+        filename: "ISO_CV.pdf",
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    }).from(element).save();
+}
+
+/* INIT */
+addJob();
+loadData();
+
+</script>
+<footer style="margin-top:20px; padding:15px; background:#0a0f1c; color:#00ffcc; text-align:center;">
+    ISO YAWI ⚡ School of Electrical Engineering ⚡ PNG University of Technology<br>
+    <em style="color:#aaa;">Building cool projects for students</em>
+</footer>
+</body>
+</html>
