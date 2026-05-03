@@ -242,6 +242,11 @@ d.innerHTML=`
 <input placeholder="Start Date">
 <input placeholder="End Date">
 <textarea placeholder="Responsibilities"></textarea>
+
+<button type="button" onclick="this.parentElement.remove()" 
+style="background:#ff4d4d; color:white; margin-top:5px;">
+Remove Job
+</button>
 `;
 get("jobBox").appendChild(d);
 }
@@ -254,6 +259,11 @@ d.innerHTML=`
 <input placeholder="Start Year">
 <input placeholder="End Year">
 <input placeholder="Qualification">
+
+<button type="button" onclick="this.parentElement.remove()" 
+style="background:#ff4d4d; color:white; margin-top:5px;">
+Remove Education
+</button>
 `;
 get("eduBox").appendChild(d);
 }
@@ -280,6 +290,10 @@ d.innerHTML=`
 
     <input type="tel" placeholder="Phone Number">
 </div>
+<button type="button" onclick="this.parentElement.remove()" 
+style="background:#ff4d4d; color:white; margin-top:5px;">
+Remove Referee
+</button>
 `;
 get("refBox").appendChild(d);
 }
