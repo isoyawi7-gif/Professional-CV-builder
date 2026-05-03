@@ -26,17 +26,14 @@ header {
     color: white;
 }
 
-/* FORM CONTAINER (GLASS) */
+/* FORM CONTAINER */
 .form-container {
     width: 90%;
     max-width: 1000px;
     margin: auto;
     padding: 20px;
-
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-
     border-radius: 10px;
 }
 
@@ -50,7 +47,7 @@ input, textarea {
     box-sizing: border-box;
 }
 
-/* BUTTONS */
+/* BUTTON */
 button {
     padding: 10px;
     background: #00ffcc;
@@ -60,7 +57,7 @@ button {
     font-weight: bold;
 }
 
-/* BACKGROUND IMAGE */
+/* BACKGROUND */
 body::before {
     content: "";
     position: fixed;
@@ -79,31 +76,26 @@ body::before {
     color: black;
     padding: 20px;
     position: relative;
-    box-sizing: border-box;
 }
 
-/* FLEX CV */
+/* CV LAYOUT */
 #cv {
     display: flex;
 }
 
-/* LEFT PANEL */
 .left {
     width: 35%;
     background: #1f2937;
     color: white;
     padding: 15px;
-    box-sizing: border-box;
 }
 
-/* RIGHT PANEL */
 .right {
     width: 65%;
     padding: 15px;
-    box-sizing: border-box;
 }
 
-/* BOXES */
+/* BOX */
 .box {
     background: #f3f4f6;
     padding: 10px;
@@ -117,18 +109,7 @@ body::before {
     right: 15px;
     font-size: 12px;
     opacity: 0.4;
-    font-weight: bold;
 }
-
-
-/* INTERESTS - ONE LINE FORMAT */
-get("interestOut").innerText =
-get("interests").value
-.split("\n")
-.filter(x => x.trim() !== "")
-.join(" • ");
-
-/*---------------------end of INTERESTS - ONE LINE FORMAT ---------------*/
 
 /* FOOTER */
 footer {
@@ -138,27 +119,8 @@ footer {
     color: #00ffcc;
 }
 
-hr {
-    border: 0;
-    border-top: 1px solid #ccc;
-}
-
-/* ===================== MOBILE RESPONSIVE ===================== */
+/* MOBILE */
 @media (max-width: 768px) {
-
-    header h1 {
-        font-size: 20px;
-    }
-
-    header h2 {
-        font-size: 16px;
-    }
-
-    .form-container {
-        width: 95%;
-        padding: 15px;
-    }
-
     #cv {
         flex-direction: column;
     }
@@ -169,11 +131,6 @@ hr {
 
     #cvWrapper {
         width: 100%;
-        padding: 15px;
-    }
-
-    input, textarea {
-        font-size: 14px;
     }
 
     button {
@@ -205,6 +162,10 @@ hr {
 <h3>Theme Color</h3>
 <input type="color" id="colorPicker">
 
+<!-- CERTIFICATIONS (FIXED POSITION) -->
+<h3>Certifications</h3>
+<textarea id="certifications" placeholder="Enter certifications (one per line)"></textarea>
+
 <h3>Jobs</h3>
 <div id="jobBox"></div>
 <button type="button" onclick="addJob()">Add Job</button>
@@ -213,7 +174,8 @@ hr {
 <div id="eduBox"></div>
 <button type="button" onclick="addEdu()">Add Education</button>
 
-<textarea id="interests" placeholder="Enter interests separated by new lines"></textarea>
+<h3>Interests</h3>
+<textarea id="interests" placeholder="Enter interests (one per line)"></textarea>
 
 <h3>Referees</h3>
 <div id="refBox"></div>
@@ -238,10 +200,9 @@ hr {
 
 <h3>KEY ACHIEVEMENTS</h3>
 <p id="achOut"></p>
-</div>
 
 <h3>CERTIFICATIONS</h3>
-<p id="achOut"></p>
+<p id="certOut"></p>
 </div>
 
 <div id="watermark">Powered by IsoYawi | Product Creator</div>
@@ -258,9 +219,9 @@ hr {
 <h3>EDUCATION</h3>
 <div id="eduOut"></div>
 
-<h3>Interests</h3>
+<h3>INTERESTS</h3>
 <div id="interestOut"></div>
-    
+
 <h3>REFEREES</h3>
 <div id="refOut"></div>
 
@@ -272,11 +233,10 @@ hr {
 
 <script>
 
-/* SAME JS (UNCHANGED) */
-
 let ready = false;
 const get = id => document.getElementById(id);
 
+/* VALIDATION */
 function sectionValid(section){
 let boxes = document.querySelectorAll(section + " .box");
 if(boxes.length === 0) return false;
@@ -297,21 +257,6 @@ alert("Fill all personal details!");
 return false;
 }
 
-if(!sectionValid("#jobBox")){
-alert("Add at least 1 complete job!");
-return false;
-}
-
-if(!sectionValid("#eduBox")){
-alert("Add at least 1 complete education!");
-return false;
-}
-
-if(!sectionValid("#refBox")){
-alert("Add at least 1 complete referee!");
-return false;
-}
-
 if(!get("achievements").value.trim()){
 alert("Enter achievements!");
 return false;
@@ -320,15 +265,116 @@ return false;
 return true;
 }
 
-/* ADD FUNCTIONS (UNCHANGED) */
-function addJob(){let d=document.createElement("div");d.className="box";d.innerHTML=`<input placeholder="Company"><input placeholder="Position"><input placeholder="Start Date"><input placeholder="End Date"><textarea placeholder="Responsibilities"></textarea><button type="button" onclick="this.parentElement.remove()" style="background:#ff4d4d;color:white;margin-top:5px;">Remove Job</button>`;get("jobBox").appendChild(d);}
-function addEdu(){let d=document.createElement("div");d.className="box";d.innerHTML=`<input placeholder="Institution"><input placeholder="Start Year"><input placeholder="End Year"><input placeholder="Qualification"><button type="button" onclick="this.parentElement.remove()" style="background:#ff4d4d;color:white;margin-top:5px;">Remove Education</button>`;get("eduBox").appendChild(d);}
-function addRef(){let d=document.createElement("div");d.className="box";d.innerHTML=`<input placeholder="Name"><input placeholder="Position"><input placeholder="Company"><input type="email" placeholder="Email"><div style="display:flex;gap:10px;"><select><option>PNG (+675)</option></select><input type="tel"></div><button type="button" onclick="this.parentElement.remove()" style="background:#ff4d4d;color:white;margin-top:5px;">Remove Referee</button>`;get("refBox").appendChild(d);}
+/* ADD JOB */
+function addJob(){
+let d=document.createElement("div");
+d.className="box";
+d.innerHTML=`
+<input placeholder="Company">
+<input placeholder="Position">
+<input placeholder="Start Date">
+<input placeholder="End Date">
+<textarea placeholder="Responsibilities"></textarea>
+<button type="button" onclick="this.parentElement.remove()">Remove Job</button>
+`;
+get("jobBox").appendChild(d);
+}
 
-/* GENERATE + PDF (UNCHANGED) */
-function generateCV(){if(!validateInputs())return;get("outName").innerText=get("name").value;get("contact").innerText=get("phone").value+" | "+get("email").value+" | "+get("address").value;ready=true;get("cvWrapper").scrollIntoView({behavior:"smooth"});alert("CV Generated");}
+/* ADD EDU */
+function addEdu(){
+let d=document.createElement("div");
+d.className="box";
+d.innerHTML=`
+<input placeholder="Institution">
+<input placeholder="Start Year">
+<input placeholder="End Year">
+<input placeholder="Qualification">
+<button type="button" onclick="this.parentElement.remove()">Remove Education</button>
+`;
+get("eduBox").appendChild(d);
+}
 
-function downloadPDF(){if(!ready){alert("Generate first");return;}const e=get("cvWrapper");html2pdf().from(e).save();}
+/* ADD REF */
+function addRef(){
+let d=document.createElement("div");
+d.className="box";
+d.innerHTML=`
+<input placeholder="Name">
+<input placeholder="Position">
+<input placeholder="Company">
+<input type="email" placeholder="Email">
+<input type="tel" placeholder="Phone">
+<button type="button" onclick="this.parentElement.remove()">Remove Referee</button>
+`;
+get("refBox").appendChild(d);
+}
+
+/* GENERATE */
+function generateCV(){
+
+if(!validateInputs()) return;
+
+get("outName").innerText = get("name").value;
+
+get("contact").innerText =
+get("phone").value + " | " +
+get("email").value + " | " +
+get("address").value;
+
+/* JOBS */
+let j="";
+document.querySelectorAll("#jobBox .box").forEach(x=>{
+let i=x.querySelectorAll("input,textarea");
+j+=`<p><b>${i[1].value}</b> - ${i[0].value}<br>${i[2].value} → ${i[3].value}<br>${i[4].value}</p>`;
+});
+get("jobOut").innerHTML=j;
+
+/* EDU */
+let e="";
+document.querySelectorAll("#eduBox .box").forEach(x=>{
+let i=x.querySelectorAll("input");
+e+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>${i[3].value}</p>`;
+});
+get("eduOut").innerHTML=e;
+
+/* INTERESTS (ONE LINE FIX) */
+get("interestOut").innerText =
+get("interests").value
+.split("\n")
+.filter(x => x.trim())
+.join(" • ");
+
+/* CERTIFICATIONS */
+get("certOut").innerText =
+get("certifications").value
+.split("\n")
+.filter(x => x.trim())
+.join(" • ");
+
+/* ACHIEVEMENTS */
+get("achOut").innerText =
+get("achievements").value
+.split("\n")
+.map(x=>"• "+x)
+.join("\n");
+
+/* SUMMARY */
+get("summary").innerText =
+get("name").value + " is a results-driven professional with strong engineering and leadership experience.";
+
+ready = true;
+get("cvWrapper").scrollIntoView({behavior:"smooth"});
+alert("CV Generated");
+}
+
+/* PDF */
+function downloadPDF(){
+if(!ready){
+alert("Generate first");
+return;
+}
+html2pdf().from(get("cvWrapper")).save();
+}
 
 </script>
 
