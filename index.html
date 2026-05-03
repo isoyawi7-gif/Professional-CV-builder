@@ -120,6 +120,16 @@ body::before {
     font-weight: bold;
 }
 
+
+/* INTERESTS - ONE LINE FORMAT */
+get("interestOut").innerText =
+get("interests").value
+.split("\n")
+.filter(x => x.trim() !== "")
+.join(" • ");
+
+/*---------------------end of INTERESTS - ONE LINE FORMAT ---------------*/
+
 /* FOOTER */
 footer {
     text-align: center;
@@ -203,6 +213,8 @@ hr {
 <div id="eduBox"></div>
 <button type="button" onclick="addEdu()">Add Education</button>
 
+<textarea id="interests" placeholder="Enter interests separated by new lines"></textarea>
+
 <h3>Referees</h3>
 <div id="refBox"></div>
 <button type="button" onclick="addRef()">Add Referee</button>
@@ -228,6 +240,10 @@ hr {
 <p id="achOut"></p>
 </div>
 
+<h3>CERTIFICATIONS</h3>
+<p id="achOut"></p>
+</div>
+
 <div id="watermark">Powered by IsoYawi | Product Creator</div>
 
 <div class="right">
@@ -242,6 +258,9 @@ hr {
 <h3>EDUCATION</h3>
 <div id="eduOut"></div>
 
+<h3>Interests</h3>
+<div id="interestOut"></div>
+    
 <h3>REFEREES</h3>
 <div id="refOut"></div>
 
