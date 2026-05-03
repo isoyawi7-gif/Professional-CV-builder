@@ -58,7 +58,9 @@ button {
     position: relative;
 }
 
-#cv { display: flex; }
+#cv {
+    display: flex;
+}
 
 .left {
     width: 35%;
@@ -84,7 +86,8 @@ button {
     right: 15px;
     font-size: 12px;
     opacity: 0.4;
-    font-weight
+    font-weight: bold;
+}
 
 footer {
     text-align: center;
@@ -154,6 +157,7 @@ hr {
 <h3>KEY ACHIEVEMENTS</h3>
 <p id="achOut"></p>
 </div>
+
 <div id="watermark">Powered by IsoYawi | Product Creator</div>
     
 <div class="right">
@@ -175,11 +179,6 @@ hr {
 
 </div>
 
-<footer style="margin-top:20px; padding:15px; background:#0a0f1c; color:#00ffcc; text-align:center;">
-    ISO YAWI ⚡ School of Electrical Engineering ⚡ PNG University of Technology<br>
-    <em style="color:#aaa;">Building cool projects for students</em>
-</footer>
-
 </div>
 
 <script>
@@ -189,7 +188,20 @@ let ready = false;
 /* SAFE GETTERS */
 const get = id => document.getElementById(id);
 
-/* VALIDATION */
+/* VALIDATION FIX (IMPORTANT BUG FIXED HERE) */
+function sectionValid(section){
+let boxes = document.querySelectorAll(section + " .box");
+if(boxes.length === 0) return false;
+
+for(let b of boxes){
+let inputs = b.querySelectorAll("input, textarea");
+for(let i of inputs){
+if(!i.value.trim()) return false;
+}
+}
+return true;
+}
+
 function validateInputs(){
 
 if(!get("name").value || !get("phone").value || !get("email").value || !get("address").value){
@@ -197,28 +209,18 @@ alert("Fill all personal details!");
 return false;
 }
 
-if(document.querySelectorAll("#jobBox .box").length === 0){
-alert("Add at least 1 job!");
+if(!sectionValid("#jobBox")){
+alert("Add at least 1 complete job!");
 return false;
 }
 
-if(document.querySelectorAll("#eduBox .box").length === 0){
-alert("Add at least 1 education!");
+if(!sectionValid("#eduBox")){
+alert("Add at least 1 complete education!");
 return false;
 }
 
-if(document.querySelectorAll("#refBox .box").length === 0){
-alert("Add at least 1 referee!");
-return false;
-}
-
-let allFilled = true;
-document.querySelectorAll(".box input, .box textarea").forEach(x=>{
-if(!x.value.trim()) allFilled = false;
-});
-
-if(!allFilled){
-alert("No empty fields allowed!");
+if(!sectionValid("#refBox")){
+alert("Add at least 1 complete referee!");
 return false;
 }
 
@@ -263,22 +265,21 @@ d.innerHTML=`
 <input placeholder="Name">
 <input placeholder="Position">
 <input placeholder="Company">
- <input type="email" placeholder="Email">
+<input type="email" placeholder="Email">
 
-    <div style="display:flex; gap:10px;">
-            <select id="countryCode">
-                <option value="+675">PNG (+675)</option>
-                <option value="+61">Australia (+61)</option>
-                <option value="+64">New Zealand (+64)</option>
-                <option value="+1">USA/Canada (+1)</option>
-                <option value="+44">UK (+44)</option>
-                <option value="+81">Japan (+81)</option>
-                <option value="+86">China (+86)</option>
-            </select>
+<div style="display:flex; gap:10px;">
+    <select class="countryCode">
+        <option value="+675">PNG (+675)</option>
+        <option value="+61">Australia (+61)</option>
+        <option value="+64">New Zealand (+64)</option>
+        <option value="+1">USA/Canada (+1)</option>
+        <option value="+44">UK (+44)</option>
+        <option value="+81">Japan (+81)</option>
+        <option value="+86">China (+86)</option>
+    </select>
 
-            <input type="tel" placeholder="Phone Number">
-        </div>
-    `;
+    <input type="tel" placeholder="Phone Number">
+</div>
 `;
 get("refBox").appendChild(d);
 }
@@ -328,8 +329,8 @@ get("name").value + " is a results-driven professional with strong experience in
 
 ready = true;
 
-/* SCROLL TO CV */
-window.scrollTo(0, get("cvWrapper").offsetTop);
+/* SCROLL */
+get("cvWrapper").scrollIntoView({ behavior: "smooth" });
 
 alert("CV Generated Successfully!");
 }
@@ -344,11 +345,9 @@ return;
 
 const element = get("cvWrapper");
 
-/* 🔥 TEMP FIX: force layout before capture */
 const originalDisplay = element.style.display;
 element.style.display = "block";
 
-/* 🔥 Force reflow (important trick) */
 element.offsetHeight;
 
 setTimeout(()=>{
@@ -358,16 +357,8 @@ html2pdf()
 margin: 10,
 filename: "CV.pdf",
 image: { type: "jpeg", quality: 1 },
-html2canvas: { 
-    scale: 2,
-    useCORS: true,
-    letterRendering: true
-},
-jsPDF: { 
-    unit: "mm", 
-    format: "a4", 
-    orientation: "portrait" 
-}
+html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
 })
 .from(element)
 .save()
@@ -385,6 +376,11 @@ document.querySelector(".left").style.background=this.value;
 });
 
 </script>
+
+<footer style="margin-top:20px; padding:15px; background:#0a0f1c; color:#00ffcc; text-align:center;">
+    ISO YAWI ⚡ School of Electrical Engineering ⚡ PNG University of Technology<br>
+    <em style="color:#aaa;">Building cool projects for students</em>
+</footer>
 
 </body>
 </html>
