@@ -80,7 +80,7 @@ body::before {
 
 /* CV LAYOUT */
 #cv {
-    display: block;
+    display: flex;
 }
 
 .left {
@@ -385,7 +385,6 @@ setTimeout(() => {
 }, 300);
 }
 
-/* PDF */
 function downloadPDF(){
 
     if(!ready){
@@ -393,22 +392,41 @@ function downloadPDF(){
         return;
     }
 
-    const element = get("cvWrapper");
+    const element = document.getElementById("cvWrapper");
+
+    let name = get("name").value.trim() || "My_CV";
+    name = name.replace(/\s+/g, "_");
 
     const opt = {
         margin: 0.3,
-        filename: 'My_CV.pdf',
+        filename: name + "_CV.pdf",
         image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        html2canvas: {
+            scale: 3,
+            useCORS: true,
+            scrollY: 0,
+            scrollX: 0,
+            logging: false
+        },
+        jsPDF: {
+            unit: 'in',
+            format: 'a4',
+            orientation: 'portrait'
+        }
     };
 
-    // small delay ensures DOM is fully painted
+    // 🔥 FORCE FULL RENDER PIPELINE
     setTimeout(() => {
-        html2pdf().set(opt).from(element).save();
-    }, 300);
-}
+        window.scrollTo(0, 0); // IMPORTANT
+        document.body.style.overflow = "visible";
 
+        html2pdf()
+            .set(opt)
+            .from(element)
+            .save();
+
+    }, 800); // 🔥 increase delay for rendering stability
+}
 </script>
 
 <footer>
