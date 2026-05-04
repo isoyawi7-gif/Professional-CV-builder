@@ -275,10 +275,10 @@ return true;
 
 /* ADD JOB */
 function addJob(){
-let d=document.createElement("div");
-d.className="box";
+let d = document.createElement("div");
+d.className = "box";
 
-d.innerHTML=`
+d.innerHTML = `
 <input placeholder="Company">
 <input placeholder="Position">
 
@@ -335,18 +335,13 @@ function calculate() {
     duration.innerText = "Duration: " + years + " yrs " + months + " months";
 }
 
-    duration.innerText = "Duration: " + years + " yrs " + months + " months";
-}
-
 /* events */
 start.addEventListener("change", calculate);
 end.addEventListener("change", calculate);
 
 present.addEventListener("change", () => {
     end.disabled = present.checked;
-    if(present.checked){
-        end.value = "";
-    }
+    if (present.checked) end.value = "";
     calculate();
 });
 }
