@@ -505,29 +505,52 @@ alert("CV generated successfully. You can now download.");
 /* DOWNLOAD */
 function downloadPDF(){
 
-if(!ready){
-alert("Please generate CV first before downloading.");
-return;
+    if(!ready){
+        alert("Please generate CV first before downloading.");
+        return;
+    }
+
+    const element = document.getElementById("cvWrapper");
+
+    let name = get("name").value.trim() || "My_CV";
+    name = name.replace(/\s+/g, "_");
+
+    const opt = {
+        margin: 0.3,
+        filename: name + "_CV.pdf",
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: {
+            scale: 3,
+            useCORS: true,
+            scrollY: 0,
+            scrollX: 0,
+            windowWidth: document.body.scrollWidth
+        },
+        jsPDF: {
+            unit: 'in',
+            format: 'a4',
+            orientation: 'portrait'
+        }
+    };
+
+    // 🔥 FIX: ensure content is fully rendered before capture
+    setTimeout(() => {
+
+        // scroll CV into view
+        element.scrollIntoView({ behavior: "auto", block: "start" });
+
+        // slight delay for rendering stability
+        setTimeout(() => {
+
+            html2pdf()
+                .set(opt)
+                .from(element)
+                .save();
+
+        }, 500);
+
+    }, 300);
 }
-
-const element = document.getElementById("cvWrapper");
-
-let name = get("name").value.trim() || "My_CV";
-name = name.replace(/\s+/g, "_");
-
-const opt = {
-    margin: 0.3,
-    filename: name + "_CV.pdf",
-    image: { type: 'jpeg', quality: 1 },
-    html2canvas: { scale: 3, useCORS: true },
-    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-};
-
-setTimeout(() => {
-    html2pdf().set(opt).from(element).save();
-}, 800);
-}
-
 </script>
 
 <footer>
