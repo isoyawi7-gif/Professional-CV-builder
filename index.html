@@ -363,18 +363,36 @@ get("achievements").value
 get("summary").innerText =
 get("name").value + " is a results-driven professional with strong engineering and leadership experience.";
 
-ready = true;
-get("cvWrapper").scrollIntoView({behavior:"smooth"});
-alert("CV Generated");
-}
+ready = false; // reset first
+
+setTimeout(() => {
+    ready = true;
+    get("cvWrapper").scrollIntoView({behavior:"smooth"});
+    alert("CV Generated Successfully. You can now download.");
+}, 300);
 
 /* PDF */
 function downloadPDF(){
-if(!ready){
-alert("Generate first");
-return;
-}
-html2pdf().from(get("cvWrapper")).save();
+
+    if(!ready){
+        alert("Please generate CV first before downloading.");
+        return;
+    }
+
+    const element = get("cvWrapper");
+
+    const opt = {
+        margin: 0.3,
+        filename: 'My_CV.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+
+    // small delay ensures DOM is fully painted
+    setTimeout(() => {
+        html2pdf().set(opt).from(element).save();
+    }, 300);
 }
 
 </script>
