@@ -308,9 +308,12 @@ let present = d.querySelector(".presentCheck");
 let duration = d.querySelector(".duration");
 
 function calculate() {
+
     if (!start.value) return;
 
     let [sy, sm] = start.value.split("-").map(Number);
+    if (!sy || !sm) return;
+
     let startDate = new Date(sy, sm - 1);
 
     let endDate;
@@ -321,6 +324,8 @@ function calculate() {
         if (!end.value) return;
 
         let [ey, em] = end.value.split("-").map(Number);
+        if (!ey || !em) return;
+
         endDate = new Date(ey, em - 1);
     }
 
@@ -408,11 +413,9 @@ let endInput = x.querySelector(".endDate").value;
 let present = x.querySelector(".presentCheck").checked;
 let responsibilities = inputs[inputs.length - 2].value;
 
-// format dates
 let startText = start ? start : "";
 let endText = present ? "Present" : endInput;
 
-// duration text
 let durationText = x.querySelector(".duration").innerText;
 
 j+=`<p>
@@ -448,30 +451,21 @@ document.querySelectorAll("#refBox .box").forEach(x=>{
 });
 get("refOut").innerHTML = r;
 
-/* INTERESTS (ONE LINE FIX) */
+
+/* INTERESTS */
 get("interestOut").innerText =
-get("interests").value
-.split("\n")
-.filter(x => x.trim())
-.join(" • ");
+get("interests").value.split("\n").filter(x => x.trim()).join(" • ");
 
 /* CERTIFICATIONS */
 get("certOut").innerText =
-get("certifications").value
-.split("\n")
-.filter(x => x.trim())
-.join(" • ");
+get("certifications").value.split("\n").filter(x => x.trim()).join(" • ");
 
 /* ACHIEVEMENTS */
 get("achOut").innerText =
-get("achievements").value
-.split("\n")
-.map(x=>"• "+x)
-.join("\n");
+get("achievements").value.split("\n").map(x=>"• "+x).join("\n");
 
-/* SUMMARY (PROFESSIONAL AUTO-GENERATED) */
 
-// collect job roles
+/* SUMMARY */
 let roles = [];
 let totalYears = 0;
 
@@ -482,11 +476,8 @@ document.querySelectorAll("#jobBox .box").forEach(x=>{
     let start = i[2].value.trim();
     let end = i[3].value.trim();
 
-    if(role){
-        roles.push(role);
-    }
+    if(role) roles.push(role);
 
-    // calculate years (simple)
     let startYear = parseInt(start);
     let endYear = end.toLowerCase() === "present" ? new Date().getFullYear() : parseInt(end);
 
@@ -495,98 +486,48 @@ document.querySelectorAll("#jobBox .box").forEach(x=>{
     }
 });
 
-// fallback if no jobs
-if(roles.length === 0){
-    roles.push("professional");
-}
+if(roles.length === 0) roles.push("professional");
 
-// remove duplicates
 roles = [...new Set(roles)];
 
-// limit to 5 roles max (clean look)
 let roleText = roles.slice(0,5).join(", ");
 
-// fallback years
-if(totalYears <= 0){
-    totalYears = "several";
-}
+if(totalYears <= 0) totalYears = "several";
 
-// build summary
 get("summary").innerText =
 "Highly versatile and results-driven " + roleText +
-" with over " + totalYears + " years of progressive experience. " +
-
-"Expertise in operations management, stakeholder engagement, and strategic execution, " +
-"with a proven ability to deliver impactful and sustainable results. " +
-
-"Recognized for improving efficiency, ensuring compliance, and building strong partnerships " +
-"that drive long-term organizational and socio-economic growth.";
+" with over " + totalYears + " years of progressive experience.";
 
 ready = true;
 alert("CV generated successfully. You can now download.");
 }
 
+/* DOWNLOAD */
 function downloadPDF(){
 
-    if(!ready){
-        alert("Please generate CV first before downloading.");
-        return;
-    }
+if(!ready){
+alert("Please generate CV first before downloading.");
+return;
+}
 
-    const element = document.getElementById("cvWrapper");
+const element = document.getElementById("cvWrapper");
 
-    let name = get("name").value.trim() || "My_CV";
-    name = name.replace(/\s+/g, "_");
+let name = get("name").value.trim() || "My_CV";
+name = name.replace(/\s+/g, "_");
 
-    const opt = {
-        margin: 0.3,
-        filename: name + "_CV.pdf",
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: {
-            scale: 3,
-            useCORS: true,
-            scrollY: 0,
-            scrollX: 0,
-            logging: false
-        },
-        jsPDF: {
-            unit: 'in',
-            format: 'a4',
-            orientation: 'portrait'
-        }
-    };
+const opt = {
+    margin: 0.3,
+    filename: name + "_CV.pdf",
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 3, useCORS: true },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+};
 
-    // 🔥 FORCE FULL RENDER PIPELINE
-   setTimeout(() => {
-    window.scrollTo(0, 0);
-    document.body.style.overflow = "visible";
-
-    html2pdf()
-        .set(opt)
-        .from(element)
-        .toPdf()
-        .get('pdf')
-        .then(function (pdf) {
-
-            const totalPages = pdf.internal.getNumberOfPages();
-
-            for (let i = 1; i <= totalPages; i++) {
-                pdf.setPage(i);
-
-                pdf.setFontSize(9);
-
-                pdf.text(
-                    `Page ${i} of ${totalPages}`,
-                    pdf.internal.pageSize.getWidth() / 2,
-                    pdf.internal.pageSize.getHeight() - 8,
-                    { align: 'center' }
-                );
-            }
-
-        })
-        .save();
-
+setTimeout(() => {
+    html2pdf().set(opt).from(element).save();
 }, 800);
+}
+
 </script>
 
 <footer>
