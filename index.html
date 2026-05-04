@@ -270,28 +270,87 @@ return true;
 function addJob(){
 let d=document.createElement("div");
 d.className="box";
+
 d.innerHTML=`
 <input placeholder="Company">
 <input placeholder="Position">
-<input placeholder="Start Date">
-<input placeholder="End Date">
+
+<label>Start Date</label>
+<input type="month" class="startDate">
+
+<label>End Date</label>
+<input type="month" class="endDate">
+
+<label>
+<input type="checkbox" class="presentCheck"> Currently Working
+</label>
+
+<p class="duration" style="font-weight:bold;"></p>
+
 <textarea placeholder="Responsibilities"></textarea>
+
 <button type="button" onclick="this.parentElement.remove()">Remove Job</button>
 `;
+
 get("jobBox").appendChild(d);
+
+/* attach listeners */
+let start = d.querySelector(".startDate");
+let end = d.querySelector(".endDate");
+let present = d.querySelector(".presentCheck");
+let duration = d.querySelector(".duration");
+
+function calculate(){
+    if(!start.value) return;
+
+    let startDate = new Date(start.value);
+    let endDate = present.checked ? new Date() : new Date(end.value);
+
+    if(!end.value && !present.checked) return;
+
+    let years = endDate.getFullYear() - startDate.getFullYear();
+    let months = endDate.getMonth() - startDate.getMonth();
+
+    if(months < 0){
+        years--;
+        months += 12;
+    }
+
+    duration.innerText = "Duration: " + years + " yrs " + months + " months";
+}
+
+/* events */
+start.addEventListener("change", calculate);
+end.addEventListener("change", calculate);
+
+present.addEventListener("change", () => {
+    end.disabled = present.checked;
+    if(present.checked){
+        end.value = "";
+    }
+    calculate();
+});
 }
 
 /* ADD EDU */
 function addEdu(){
 let d=document.createElement("div");
 d.className="box";
+
 d.innerHTML=`
 <input placeholder="Institution">
-<input placeholder="Start Year">
-<input placeholder="End Year">
+
+<label>Start Date</label>
+<input type="month" class="eduStart">
+
+<label>End Date</label>
+<input type="month" class="eduEnd">
+
 <input placeholder="Qualification">
+
 <button type="button" onclick="this.parentElement.remove()">Remove Education</button>
 `;
+
 get("eduBox").appendChild(d);
 }
 
@@ -325,9 +384,31 @@ get("address").value;
 /* JOBS */
 let j="";
 document.querySelectorAll("#jobBox .box").forEach(x=>{
-let i=x.querySelectorAll("input,textarea");
-j+=`<p><b>${i[1].value}</b> - ${i[0].value}<br>${i[2].value} → ${i[3].value}<br>${i[4].value}</p>`;
+
+let inputs = x.querySelectorAll("input, textarea");
+
+let company = inputs[0].value;
+let position = inputs[1].value;
+let start = x.querySelector(".startDate").value;
+let endInput = x.querySelector(".endDate").value;
+let present = x.querySelector(".presentCheck").checked;
+let responsibilities = inputs[inputs.length - 2].value;
+
+// format dates
+let startText = start ? start : "";
+let endText = present ? "Present" : endInput;
+
+// duration text
+let durationText = x.querySelector(".duration").innerText;
+
+j+=`<p>
+<b>${position}</b> - ${company}<br>
+${startText} → ${endText}<br>
+${durationText}<br>
+${responsibilities}
+</p>`;
 });
+
 get("jobOut").innerHTML=j;
 
 /* EDU */
@@ -372,18 +453,58 @@ get("achievements").value
 .map(x=>"• "+x)
 .join("\n");
 
-/* SUMMARY */
-get("summary").innerText =
-get("name").value + " is a results-driven professional with strong engineering and leadership experience.";
+/* SUMMARY (PROFESSIONAL AUTO-GENERATED) */
 
-ready = false; // reset first
+// collect job roles
+let roles = [];
+let totalYears = 0;
 
-setTimeout(() => {
-    ready = true;
-    get("cvWrapper").scrollIntoView({behavior:"smooth"});
-    alert("CV Generated Successfully. You can now download.");
-}, 300);
+document.querySelectorAll("#jobBox .box").forEach(x=>{
+    let i = x.querySelectorAll("input");
+
+    let role = i[1].value.trim();
+    let start = i[2].value.trim();
+    let end = i[3].value.trim();
+
+    if(role){
+        roles.push(role);
+    }
+
+    // calculate years (simple)
+    let startYear = parseInt(start);
+    let endYear = end.toLowerCase() === "present" ? new Date().getFullYear() : parseInt(end);
+
+    if(!isNaN(startYear) && !isNaN(endYear)){
+        totalYears += (endYear - startYear);
+    }
+});
+
+// fallback if no jobs
+if(roles.length === 0){
+    roles.push("professional");
 }
+
+// remove duplicates
+roles = [...new Set(roles)];
+
+// limit to 5 roles max (clean look)
+let roleText = roles.slice(0,5).join(", ");
+
+// fallback years
+if(totalYears <= 0){
+    totalYears = "several";
+}
+
+// build summary
+get("summary").innerText =
+"Highly versatile and results-driven " + roleText +
+" with over " + totalYears + " years of progressive experience. " +
+
+"Expertise in operations management, stakeholder engagement, and strategic execution, " +
+"with a proven ability to deliver impactful and sustainable results. " +
+
+"Recognized for improving efficiency, ensuring compliance, and building strong partnerships " +
+"that drive long-term organizational and socio-economic growth.";
 
 function downloadPDF(){
 
@@ -416,17 +537,36 @@ function downloadPDF(){
     };
 
     // 🔥 FORCE FULL RENDER PIPELINE
-    setTimeout(() => {
-        window.scrollTo(0, 0); // IMPORTANT
-        document.body.style.overflow = "visible";
+   setTimeout(() => {
+    window.scrollTo(0, 0);
+    document.body.style.overflow = "visible";
 
-        html2pdf()
-            .set(opt)
-            .from(element)
-            .save();
+    html2pdf()
+        .set(opt)
+        .from(element)
+        .toPdf()
+        .get('pdf')
+        .then(function (pdf) {
 
-    }, 800); // 🔥 increase delay for rendering stability
-}
+            const totalPages = pdf.internal.getNumberOfPages();
+
+            for (let i = 1; i <= totalPages; i++) {
+                pdf.setPage(i);
+
+                pdf.setFontSize(9);
+
+                pdf.text(
+                    `Page ${i} of ${totalPages}`,
+                    pdf.internal.pageSize.getWidth() / 2,
+                    pdf.internal.pageSize.getHeight() - 8,
+                    { align: 'center' }
+                );
+            }
+
+        })
+        .save();
+
+}, 800);
 </script>
 
 <footer>
