@@ -80,7 +80,7 @@ body::before {
 
 /* CV LAYOUT */
 #cv {
-    display: flex;
+    display: block;
 }
 
 .left {
@@ -337,6 +337,19 @@ let i=x.querySelectorAll("input");
 e+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>${i[3].value}</p>`;
 });
 get("eduOut").innerHTML=e;
+
+/* REFEREES */
+let r = "";
+document.querySelectorAll("#refBox .box").forEach(x=>{
+    let i = x.querySelectorAll("input");
+    r += `<p>
+        <b>${i[0].value}</b><br>
+        ${i[1].value} - ${i[2].value}<br>
+        ${i[3].value}<br>
+        ${i[4].value}
+    </p>`;
+});
+get("refOut").innerHTML = r;
 
 /* INTERESTS (ONE LINE FIX) */
 get("interestOut").innerText =
