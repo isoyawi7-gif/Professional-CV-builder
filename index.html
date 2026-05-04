@@ -237,6 +237,13 @@ footer {
 let ready = false;
 const get = id => document.getElementById(id);
 
+document.querySelectorAll("input, textarea").forEach(el => {
+    el.addEventListener("input", () => {
+        ready = false;
+    });
+});
+
+
 /* VALIDATION */
 function sectionValid(section){
 let boxes = document.querySelectorAll(section + " .box");
@@ -300,21 +307,33 @@ let end = d.querySelector(".endDate");
 let present = d.querySelector(".presentCheck");
 let duration = d.querySelector(".duration");
 
-function calculate(){
-    if(!start.value) return;
+function calculate() {
+    if (!start.value) return;
 
-    let startDate = new Date(start.value);
-    let endDate = present.checked ? new Date() : new Date(end.value);
+    let [sy, sm] = start.value.split("-").map(Number);
+    let startDate = new Date(sy, sm - 1);
 
-    if(!end.value && !present.checked) return;
+    let endDate;
+
+    if (present.checked) {
+        endDate = new Date();
+    } else {
+        if (!end.value) return;
+
+        let [ey, em] = end.value.split("-").map(Number);
+        endDate = new Date(ey, em - 1);
+    }
 
     let years = endDate.getFullYear() - startDate.getFullYear();
     let months = endDate.getMonth() - startDate.getMonth();
 
-    if(months < 0){
+    if (months < 0) {
         years--;
         months += 12;
     }
+
+    duration.innerText = "Duration: " + years + " yrs " + months + " months";
+}
 
     duration.innerText = "Duration: " + years + " yrs " + months + " months";
 }
@@ -410,7 +429,7 @@ ${responsibilities}
 });
 
 get("jobOut").innerHTML=j;
-}
+
 
 /* EDU */
 let e="";
@@ -420,7 +439,6 @@ e+=`<p><b>${i[0].value}</b><br>${i[1].value} - ${i[2].value}<br>${i[3].value}</p
 });
 get("eduOut").innerHTML=e;
 
-    }
 
 /* REFEREES */
 let r = "";
@@ -508,6 +526,10 @@ get("summary").innerText =
 
 "Recognized for improving efficiency, ensuring compliance, and building strong partnerships " +
 "that drive long-term organizational and socio-economic growth.";
+
+ready = true;
+alert("CV generated successfully. You can now download.");
+}
 
 function downloadPDF(){
 
