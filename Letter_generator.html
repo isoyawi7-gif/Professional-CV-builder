@@ -1,0 +1,442 @@
+# AI CV Interest Letter Generator (Frontend Only)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CV Interest Letter Generator</title>
+
+<!-- PDF Reader -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<!-- DOCX Reader -->
+<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#0f172a,#1e293b,#0f172a);
+    min-height:100vh;
+    padding:30px;
+    color:white;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(15px);
+    border-radius:25px;
+    padding:40px;
+    border:1px solid rgba(255,255,255,0.1);
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:10px;
+    font-size:38px;
+    background:linear-gradient(to right,#00c6ff,#0072ff);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+    text-align:center;
+    color:#cbd5e1;
+    margin-bottom:40px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+}
+
+.card{
+    background:rgba(255,255,255,0.05);
+    padding:25px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.08);
+}
+
+.card h2{
+    margin-bottom:20px;
+}
+
+.upload-box{
+    border:2px dashed rgba(255,255,255,0.2);
+    border-radius:15px;
+    padding:40px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.upload-box:hover{
+    border-color:#00c6ff;
+    background:rgba(255,255,255,0.05);
+}
+
+.upload-box input{
+    display:none;
+}
+
+textarea{
+    width:100%;
+    height:300px;
+    border:none;
+    outline:none;
+    border-radius:15px;
+    padding:20px;
+    background:rgba(255,255,255,0.08);
+    color:white;
+    resize:none;
+    font-size:14px;
+}
+
+textarea::placeholder{
+    color:#94a3b8;
+}
+
+button{
+    background:linear-gradient(135deg,#00c6ff,#0072ff);
+    border:none;
+    color:white;
+    padding:16px 40px;
+    border-radius:50px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:600;
+    margin-top:30px;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:translateY(-3px);
+}
+
+.center{
+    text-align:center;
+}
+
+.output{
+    margin-top:40px;
+    background:rgba(255,255,255,0.05);
+    padding:30px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.08);
+    display:none;
+}
+
+.result{
+    margin-top:20px;
+    white-space:pre-wrap;
+    line-height:1.8;
+    color:#e2e8f0;
+}
+
+.info{
+    margin-top:15px;
+    color:#00c6ff;
+    font-size:14px;
+}
+
+@media(max-width:900px){
+
+.grid{
+    grid-template-columns:1fr;
+}
+
+h1{
+    font-size:28px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>AI Interest Letter Generator</h1>
+<p class="subtitle">
+Upload your CV and paste the Job Description. The system will read both and generate a tailored interest letter.
+</p>
+
+<div class="grid">
+
+<div class="card">
+
+<h2>Upload CV</h2>
+
+<label class="upload-box">
+<input type="file" id="cvUpload" accept=".pdf,.docx,.txt">
+<h3>📄 Upload CV</h3>
+<p>Supports PDF, DOCX and TXT</p>
+</label>
+
+<p class="info" id="fileName"></p>
+
+</div>
+
+<div class="card">
+
+<h2>Job Description</h2>
+
+<textarea id="jobDescription" placeholder="Paste job description here..."></textarea>
+
+</div>
+
+</div>
+
+<div class="center">
+<button onclick="generateLetter()">Generate Interest Letter</button>
+<button onclick="goBack()" style="margin-left:15px;background:linear-gradient(135deg,#475569,#1e293b);">⬅ Back to Index</button>
+</div>
+
+<div class="output" id="outputSection">
+
+<h2>Generated Interest Letter</h2>
+
+<div class="result" id="result"></div>
+
+</div>
+
+</div>
+
+<script>
+
+let cvText = "";
+
+const cvUpload = document.getElementById("cvUpload");
+const fileName = document.getElementById("fileName");
+
+cvUpload.addEventListener("change", async function(e){
+
+    const file = e.target.files[0];
+
+    if(!file) return;
+
+    fileName.innerHTML = "Uploaded: " + file.name;
+
+    const extension = file.name.split('.').pop().toLowerCase();
+
+    if(extension === 'txt'){
+
+        const reader = new FileReader();
+
+        reader.onload = function(event){
+            cvText = event.target.result;
+            console.log(cvText);
+        }
+
+        reader.readAsText(file);
+    }
+
+    else if(extension === 'docx'){
+
+        const reader = new FileReader();
+
+        reader.onload = async function(event){
+
+            const arrayBuffer = event.target.result;
+
+            const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+
+            cvText = result.value;
+
+            console.log(cvText);
+        }
+
+        reader.readAsArrayBuffer(file);
+    }
+
+    else if(extension === 'pdf'){
+
+        const reader = new FileReader();
+
+        reader.onload = async function(event){
+
+            const typedArray = new Uint8Array(event.target.result);
+
+            const pdf = await pdfjsLib.getDocument(typedArray).promise;
+
+            let fullText = '';
+
+            for(let i = 1; i <= pdf.numPages; i++){
+
+                const page = await pdf.getPage(i);
+
+                const textContent = await page.getTextContent();
+
+                const textItems = textContent.items.map(item => item.str);
+
+                fullText += textItems.join(' ') + ' ';
+            }
+
+            cvText = fullText;
+
+            console.log(cvText);
+        }
+
+        reader.readAsArrayBuffer(file);
+    }
+
+    else{
+        alert("Unsupported file type.");
+    }
+
+});
+
+function extractSkills(text){
+
+    const keywords = [
+        "leadership",
+        "engineering",
+        "telecommunications",
+        "network",
+        "project management",
+        "electrical",
+        "python",
+        "troubleshooting",
+        "management",
+        "team leader",
+        "radio",
+        "base station",
+        "VSAT",
+        "fiber",
+        "IT",
+        "communication",
+        "maintenance",
+        "operations",
+        "planning",
+        "analysis"
+    ];
+
+    let found = [];
+
+    keywords.forEach(skill => {
+
+        if(text.toLowerCase().includes(skill.toLowerCase())){
+            found.push(skill);
+        }
+
+    });
+
+    return found;
+}
+
+function extractName(text){
+
+    const lines = text.split('\n');
+
+    for(let line of lines){
+
+        line = line.trim();
+
+        if(line.length > 3 && line.length < 40){
+            return line;
+        }
+    }
+
+    return "Applicant";
+}
+
+function goBack(){
+    window.location.href = "index.html";
+}
+
+function generateLetter(){
+
+    const jobDescription = document.getElementById("jobDescription").value;
+
+    if(cvText === ""){
+        alert("Please upload your CV first.");
+        return;
+    }
+
+    if(jobDescription.trim() === ""){
+        alert("Please paste the job description.");
+        return;
+    }
+
+    const skills = extractSkills(cvText);
+
+    const name = extractName(cvText);
+
+    const matchedSkills = skills.join(', ');
+
+    let experienceLine = "";
+
+    if(cvText.toLowerCase().includes("10 years")){
+        experienceLine = "With over 10 years of professional experience, ";
+    }
+
+    const letter = `Dear Hiring Manager,
+
+I am writing to express my strong interest in the advertised position within your organization.
+
+${experienceLine}I believe my qualifications, technical background, and leadership capabilities align strongly with the requirements outlined in the job description.
+
+Based on my CV, I possess experience and skills in ${matchedSkills}. These capabilities position me to contribute effectively to your organization while supporting operational excellence and professional standards.
+
+I am highly motivated, adaptable, and committed to delivering quality results while working collaboratively within teams and leadership environments.
+
+I would welcome the opportunity to further discuss how my experience, technical knowledge, and professional background can contribute positively to your organization.
+
+Thank you for considering my application.
+
+Sincerely,
+${name}`;
+
+    document.getElementById("outputSection").style.display = "block";
+
+    document.getElementById("result").innerHTML = letter;
+}
+
+</script>
+
+</body>
+</html>
+```
+
+# How It Works
+
+* Upload CV (PDF/DOCX/TXT)
+* JavaScript reads the CV directly in the browser
+* User pastes Job Description
+* Frontend extracts skills from CV
+* Generates tailored interest letter automatically
+* No backend required
+* Can upload directly to GitHub Pages
+
+# GitHub Upload
+
+1. Create repository
+2. Upload this file as:
+
+```txt
+index.html
+```
+
+3. Enable GitHub Pages:
+
+* Settings
+* Pages
+* Deploy from branch
+* Select main branch
+
+Your AI CV generator website will go live instantly.
